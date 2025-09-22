@@ -64,14 +64,7 @@ const App = () => {
         </Route>
         {/* Vendor Protected Routes (with Vendor Sidebar) */}
 
-        <Route
-          path="create-project"
-          element={
-            <ProtectedRoute allowedRoles={["customer"]}>
-              <CreateProject />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="create-project" element={<CreateProject />} />
         <Route
           path="/"
           element={
