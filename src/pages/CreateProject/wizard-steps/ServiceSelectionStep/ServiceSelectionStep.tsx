@@ -1,11 +1,7 @@
 import { useState } from "react";
+import { type ServiceSelectionStepProps, type ServiceOption } from "./interfaces";
 
-interface ServiceSelectionStepProps {
-  onNext: () => void;
-  onBack: () => void;
-}
-
-const services = [
+const services: ServiceOption[] = [
   { id: "air-conditioning", name: "Air conditioning" },
   { id: "heating", name: "Heating" },
   { id: "thermostat", name: "Thermostat and accessories" },

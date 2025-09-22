@@ -32,6 +32,13 @@ import {
 // Wizard steps with components
 const wizardSteps = [
   {
+    id: "address",
+    icon: MapPin,
+    title: "Property Address",
+    subtitle: "Where is your property located?",
+    component: AddressStep,
+  },
+  {
     id: "zip",
     icon: MapPin,
     title: "What's your ZIP code?",
@@ -80,13 +87,13 @@ const wizardSteps = [
     subtitle: "What type of property is this?",
     component: HomeDetailsStep,
   },
-  {
-    id: "address",
-    icon: MapPin,
-    title: "Property Address",
-    subtitle: "Where is your property located?",
-    component: AddressStep,
-  },
+  // {
+  //   id: "address",
+  //   icon: MapPin,
+  //   title: "Property Address",
+  //   subtitle: "Where is your property located?",
+  //   component: AddressStep,
+  // },
   {
     id: "timeline",
     icon: Calendar,

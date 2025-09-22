@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { Check } from "phosphor-react";
-
-interface ZipCodeStepProps {
-  onNext: () => void;
-  onBack: () => void;
-}
+import { type ZipCodeStepProps } from "./interfaces";
 
 const ZipCodeStep = ({}: ZipCodeStepProps) => {
   const [zipCode, setZipCode] = useState("");

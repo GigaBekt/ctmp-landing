@@ -7,11 +7,7 @@ import {
   Clock,
   PhoneCall,
 } from "phosphor-react";
-
-interface HelpModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+import { type HelpModalProps } from "./interfaces";
 
 const HelpModal = ({ isOpen, onClose }: HelpModalProps) => {
   const [phoneNumber, setPhoneNumber] = useState("");
