@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Envelope,
@@ -70,6 +70,7 @@ const RegisterForm = () => {
     confirmPassword: "",
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -111,7 +112,9 @@ const RegisterForm = () => {
     // Mock loading for visual purposes
     setTimeout(() => {
       setIsLoading(false);
-      // Mock navigation would happen here
+      // Mock navigation based on user type
+
+      navigate("/dashboard");
       console.log("Register form submitted (visual only):", formData);
     }, 3000);
   };

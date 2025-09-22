@@ -5,11 +5,6 @@ import path from "path";
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  define: {
-    "%VITE_GOOGLE_MAPS_API_KEY%": JSON.stringify(
-      process.env.VITE_GOOGLE_MAPS_API_KEY || ""
-    ),
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
