@@ -1,669 +1,268 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/stores/auth";
-import { Upload, X, House, Wrench } from "phosphor-react";
-import type { HouseInfo, JobType, Address } from "@/types";
-import { AC_BRANDS, US_STATES } from "@/types";
+import {
+  MapPin,
+  House,
+  Wrench,
+  Check,
+  ArrowLeft,
+  ArrowRight,
+  Question,
+  Info,
+  Fire,
+  Lightning,
+  Calendar,
+  Ruler,
+  CurrencyDollar,
+} from "phosphor-react";
+import { Button } from "@/components";
+import {
+  ZipCodeStep,
+  ServiceSelectionStep,
+  HeatSourceStep,
+  SystemDetailsStep,
+  SquareFeetStep,
+  EstimatePriceStep,
+  HomeDetailsStep,
+  AddressStep,
+  TimelineStep,
+  HelpModal,
+} from "./wizard-steps";
+
+// Wizard steps with components
+const wizardSteps = [
+  {
+    id: "zip",
+    icon: MapPin,
+    title: "What's your ZIP code?",
+    subtitle: "We'll find qualified professionals in your area",
+    component: ZipCodeStep,
+  },
+  {
+    id: "service",
+    icon: Wrench,
+    title: "Choose Service",
+    subtitle: "What type of service do you need?",
+    component: ServiceSelectionStep,
+  },
+  {
+    id: "heat-source",
+    icon: Fire,
+    title: "Choose Heat Source",
+    subtitle: "What type of heating system do you prefer?",
+    component: HeatSourceStep,
+  },
+  {
+    id: "system-details",
+    icon: Lightning,
+    title: "System Installation",
+    subtitle: "Tell us about your installation preferences",
+    component: SystemDetailsStep,
+  },
+  {
+    id: "square-feet",
+    icon: Ruler,
+    title: "Home Size",
+    subtitle: "What's your home's square footage?",
+    component: SquareFeetStep,
+  },
+  {
+    id: "estimate-price",
+    icon: CurrencyDollar,
+    title: "Estimated Cost",
+    subtitle: "See your project price estimate",
+    component: EstimatePriceStep,
+  },
+  {
+    id: "home-details",
+    icon: House,
+    title: "Home Type",
+    subtitle: "What type of property is this?",
+    component: HomeDetailsStep,
+  },
+  {
+    id: "address",
+    icon: MapPin,
+    title: "Property Address",
+    subtitle: "Where is your property located?",
+    component: AddressStep,
+  },
+  {
+    id: "timeline",
+    icon: Calendar,
+    title: "When do you need this work done?",
+    subtitle: "Choose your preferred timeline",
+    component: TimelineStep,
+  },
+];
 
 const CreateProject = () => {
-  const { user } = useAuthStore();
   const navigate = useNavigate();
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [showHelp] = useState(false);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  const currentStep = wizardSteps[currentStepIndex];
 
-  // Form data state
-  const [address, setAddress] = useState<Address>({
-    street: "",
-    city: "",
-    state: "CA",
-    zipCode: "",
-  });
-
-  const [houseInfo, setHouseInfo] = useState<HouseInfo>({
-    floors: 1,
-    totalSqft: 0,
-    floorSqft: [0],
-  });
-
-  const [jobType, setJobType] = useState<JobType>("install");
-  const [preferredBrands, setPreferredBrands] = useState<string[]>([]);
-  const [description, setDescription] = useState("");
-  const [images, setImages] = useState<File[]>([]);
-  const [existingSystemImages, setExistingSystemImages] = useState<File[]>([]);
-
-  const handleFloorsChange = (floors: number) => {
-    setHouseInfo((prev) => ({
-      ...prev,
-      floors,
-      floorSqft: Array(floors)
-        .fill(0)
-        .map((_, i) => prev.floorSqft[i] || 0),
-    }));
-  };
-
-  const handleFloorSqftChange = (index: number, sqft: number) => {
-    setHouseInfo((prev) => ({
-      ...prev,
-      floorSqft: prev.floorSqft.map((val, i) => (i === index ? sqft : val)),
-      totalSqft: prev.floorSqft.reduce(
-        (sum, val, i) => sum + (i === index ? sqft : val),
-        0
-      ),
-    }));
-  };
-
-  const handleBrandToggle = (brand: string) => {
-    setPreferredBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
-    );
-  };
-
-  const handleImageUpload = (
-    files: FileList | null,
-    type: "general" | "existing"
-  ) => {
-    if (!files) return;
-
-    const fileArray = Array.from(files);
-    if (type === "general") {
-      setImages((prev) => [...prev, ...fileArray]);
-    } else {
-      setExistingSystemImages((prev) => [...prev, ...fileArray]);
+  const handleNext = () => {
+    if (currentStepIndex < wizardSteps.length - 1) {
+      setCurrentStepIndex((prev) => prev + 1);
     }
   };
 
-  const removeImage = (index: number, type: "general" | "existing") => {
-    if (type === "general") {
-      setImages((prev) => prev.filter((_, i) => i !== index));
-    } else {
-      setExistingSystemImages((prev) => prev.filter((_, i) => i !== index));
+  const handleBack = () => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex((prev) => prev - 1);
     }
   };
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // In a real app, you would upload images and create the project
-      console.log("Project data:", {
-        customerId: user?.id,
-        address,
-        houseInfo,
-        jobType,
-        preferredBrands,
-        description,
-        images: images.map((f) => f.name),
-        existingSystemImages: existingSystemImages.map((f) => f.name),
-      });
-
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Failed to create project:", error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSubmit = () => {
+    alert("Request submitted successfully!");
+    navigate("/dashboard");
   };
 
-  const steps = [
-    { number: 1, title: "Property Details", icon: House },
-    { number: 2, title: "Job Information", icon: Wrench },
-    { number: 3, title: "Photos & Submit", icon: Upload },
-  ];
+  const renderCurrentStep = () => {
+    const currentStep = wizardSteps[currentStepIndex];
+    const StepComponent = currentStep.component;
+
+    return <StepComponent onNext={handleNext} onBack={handleBack} />;
+  };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Create New Project
-        </h1>
-        <p className="text-gray-600">
-          Get quotes from certified HVAC professionals in your area
-        </p>
-      </div>
-
-      {/* Progress Steps */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center">
-              <div
-                className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                  currentStep >= step.number
-                    ? "bg-primary-600 border-primary-600 text-white"
-                    : "border-gray-300 text-gray-400"
-                }`}
-              >
-                <step.icon className="h-5 w-5" />
-              </div>
-              <div className="ml-3">
-                <p
-                  className={`text-sm font-medium ${
-                    currentStep >= step.number
-                      ? "text-primary-600"
-                      : "text-gray-400"
-                  }`}
-                >
-                  Step {step.number}
-                </p>
-                <p
-                  className={`text-xs ${
-                    currentStep >= step.number
-                      ? "text-gray-900"
-                      : "text-gray-400"
-                  }`}
-                >
-                  {step.title}
-                </p>
-              </div>
-              {index < steps.length - 1 && (
-                <div
-                  className={`flex-1 h-0.5 mx-4 ${
-                    currentStep > step.number ? "bg-primary-600" : "bg-gray-200"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50">
+      {/* Clean Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-4">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
+          <div className="flex items-center">
+            <button onClick={() => navigate("/dashboard")}>
+              <h1 className="text-2xl font-bold text-[#2c74b3] tracking-wide font-heading">
+                CTMP
+              </h1>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        {/* Step 1: Property Details */}
-        {currentStep === 1 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Property Details
-            </h2>
-
-            {/* Address */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Street Address
-                </label>
-                <input
-                  type="text"
-                  value={address.street}
-                  onChange={(e) =>
-                    setAddress((prev) => ({ ...prev, street: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="123 Main Street"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <input
-                  type="text"
-                  value={address.city}
-                  onChange={(e) =>
-                    setAddress((prev) => ({ ...prev, city: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="Los Angeles"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State
-                </label>
-                <select
-                  value={address.state}
-                  onChange={(e) =>
-                    setAddress((prev) => ({ ...prev, state: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                >
-                  {US_STATES.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ZIP Code
-                </label>
-                <input
-                  type="text"
-                  value={address.zipCode}
-                  onChange={(e) =>
-                    setAddress((prev) => ({ ...prev, zipCode: e.target.value }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                  placeholder="90210"
-                />
-              </div>
-            </div>
-
-            {/* House Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                House Information
-              </h3>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Number of Floors
-                </label>
-                <select
-                  value={houseInfo.floors}
-                  onChange={(e) => handleFloorsChange(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                >
-                  {[1, 2, 3, 4].map((num) => (
-                    <option key={num} value={num}>
-                      {num} Floor{num > 1 ? "s" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {houseInfo.floorSqft.map((sqft, index) => (
-                <div key={index}>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Floor {index + 1} Square Footage
-                  </label>
-                  <input
-                    type="number"
-                    value={sqft}
-                    onChange={(e) =>
-                      handleFloorSqftChange(
-                        index,
-                        parseInt(e.target.value) || 0
-                      )
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="1200"
-                  />
-                </div>
-              ))}
-
-              <div className="bg-gray-50 p-3 rounded-md">
-                <p className="text-sm text-gray-600">
-                  Total Square Footage:{" "}
-                  <span className="font-medium">
-                    {houseInfo.totalSqft} sqft
-                  </span>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Step 2: Job Information */}
-        {currentStep === 2 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Job Information
-            </h2>
-
-            {/* Job Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                What type of work do you need?
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <label className="relative">
-                  <input
-                    type="radio"
-                    name="jobType"
-                    value="install"
-                    checked={jobType === "install"}
-                    onChange={(e) => setJobType(e.target.value as JobType)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                      jobType === "install"
-                        ? "border-primary-500 bg-primary-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <h3 className="font-medium text-gray-900">
-                      New Installation
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Main Content */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Help Panel */}
+          {showHelp && (
+            <div className="bg-blue-50 border-b border-blue-200">
+              <div className="p-4 sm:p-6">
+                <div className="flex items-start gap-3">
+                  <Info className="w-5 h-5 text-[#2c74b3] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h3 className="font-semibold text-[#2c74b3] mb-2">
+                      Step Guide
                     </h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Install a new HVAC system in a home without existing AC
+                    <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
+                      {getStepHelpText(currentStep.id)}
                     </p>
                   </div>
-                </label>
-
-                <label className="relative">
-                  <input
-                    type="radio"
-                    name="jobType"
-                    value="replace"
-                    checked={jobType === "replace"}
-                    onChange={(e) => setJobType(e.target.value as JobType)}
-                    className="sr-only"
-                  />
-                  <div
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
-                      jobType === "replace"
-                        ? "border-primary-500 bg-primary-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <h3 className="font-medium text-gray-900">Replacement</h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Replace an existing HVAC system with a new one
-                    </p>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            {/* Existing System Info (only for replacement) */}
-            {jobType === "replace" && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900">
-                  Existing System Information
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Current System Age (years)
-                    </label>
-                    <input
-                      type="number"
-                      value={houseInfo.existingAcAge || ""}
-                      onChange={(e) =>
-                        setHouseInfo((prev) => ({
-                          ...prev,
-                          existingAcAge: parseInt(e.target.value) || undefined,
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      placeholder="15"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Current Brand (if known)
-                    </label>
-                    <input
-                      type="text"
-                      value={houseInfo.existingAcBrand || ""}
-                      onChange={(e) =>
-                        setHouseInfo((prev) => ({
-                          ...prev,
-                          existingAcBrand: e.target.value,
-                        }))
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                      placeholder="Carrier, Trane, etc."
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Location of Existing System
-                  </label>
-                  <input
-                    type="text"
-                    value={houseInfo.existingAcLocation || ""}
-                    onChange={(e) =>
-                      setHouseInfo((prev) => ({
-                        ...prev,
-                        existingAcLocation: e.target.value,
-                      }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                    placeholder="Backyard, side of house, garage, etc."
-                  />
                 </div>
               </div>
-            )}
-
-            {/* Preferred Brands */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Preferred Brands (optional)
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                {AC_BRANDS.map((brand) => (
-                  <label key={brand} className="relative">
-                    <input
-                      type="checkbox"
-                      checked={preferredBrands.includes(brand)}
-                      onChange={() => handleBrandToggle(brand)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`p-2 text-sm border rounded-md cursor-pointer text-center transition-colors ${
-                        preferredBrands.includes(brand)
-                          ? "border-primary-500 bg-primary-50 text-primary-700"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      {brand}
-                    </div>
-                  </label>
-                ))}
-              </div>
             </div>
-
-            {/* Additional Description */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Additional Details (optional)
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                placeholder="Any specific requirements, timeline preferences, or additional information..."
-              />
-            </div>
-          </div>
-        )}
-
-        {/* Step 3: Photos & Submit */}
-        {currentStep === 3 && (
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Photos & Submit
-            </h2>
-
-            {/* General Photos */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Property Photos
-              </label>
-              <p className="text-sm text-gray-600 mb-3">
-                Upload photos of the area where the HVAC system will be
-                installed or the general property
-              </p>
-
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={(e) => handleImageUpload(e.target.files, "general")}
-                  className="hidden"
-                  id="general-images"
-                />
-                <label
-                  htmlFor="general-images"
-                  className="cursor-pointer flex flex-col items-center"
-                >
-                  <Upload className="h-12 w-12 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-600">
-                    Click to upload images
-                  </p>
-                </label>
-              </div>
-
-              {images.length > 0 && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                  {images.map((file, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Upload ${index + 1}`}
-                        className="w-full h-24 object-cover rounded-md"
-                      />
-                      <button
-                        onClick={() => removeImage(index, "general")}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Existing System Photos (only for replacement) */}
-            {jobType === "replace" && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
-                  Existing System Photos
-                </label>
-                <p className="text-sm text-gray-600 mb-3">
-                  Upload photos of your current HVAC system (both indoor and
-                  outdoor units)
-                </p>
-
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) =>
-                      handleImageUpload(e.target.files, "existing")
-                    }
-                    className="hidden"
-                    id="existing-images"
-                  />
-                  <label
-                    htmlFor="existing-images"
-                    className="cursor-pointer flex flex-col items-center"
-                  >
-                    <Upload className="h-12 w-12 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">
-                      Click to upload existing system photos
-                    </p>
-                  </label>
-                </div>
-
-                {existingSystemImages.length > 0 && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                    {existingSystemImages.map((file, index) => (
-                      <div key={index} className="relative">
-                        <img
-                          src={URL.createObjectURL(file)}
-                          alt={`Existing system ${index + 1}`}
-                          className="w-full h-24 object-cover rounded-md"
-                        />
-                        <button
-                          onClick={() => removeImage(index, "existing")}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Project Summary */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h3 className="font-medium text-gray-900 mb-2">
-                Project Summary
-              </h3>
-              <div className="space-y-1 text-sm text-gray-600">
-                <p>
-                  <span className="font-medium">Address:</span> {address.street}
-                  , {address.city}, {address.state} {address.zipCode}
-                </p>
-                <p>
-                  <span className="font-medium">Property:</span>{" "}
-                  {houseInfo.floors} floor{houseInfo.floors > 1 ? "s" : ""},{" "}
-                  {houseInfo.totalSqft} sqft total
-                </p>
-                <p>
-                  <span className="font-medium">Job Type:</span>{" "}
-                  {jobType === "install"
-                    ? "New Installation"
-                    : "System Replacement"}
-                </p>
-                {preferredBrands.length > 0 && (
-                  <p>
-                    <span className="font-medium">Preferred Brands:</span>{" "}
-                    {preferredBrands.join(", ")}
-                  </p>
-                )}
-                <p>
-                  <span className="font-medium">Photos:</span> {images.length}{" "}
-                  property photo{images.length !== 1 ? "s" : ""}
-                  {jobType === "replace"
-                    ? `, ${existingSystemImages.length} existing system photo${
-                        existingSystemImages.length !== 1 ? "s" : ""
-                      }`
-                    : ""}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between pt-6 border-t">
-          <button
-            onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
-            disabled={currentStep === 1}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Previous
-          </button>
-
-          {currentStep < 3 ? (
-            <button
-              onClick={() => setCurrentStep((prev) => prev + 1)}
-              className="px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700"
-            >
-              Next
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={isLoading}
-              className="px-6 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Creating Project...
-                </div>
-              ) : (
-                "Create Project"
-              )}
-            </button>
           )}
+
+          {/* Step Content */}
+          <div className="p-4 sm:p-6 lg:p-8 relative">
+            {/* Help Button */}
+            <button
+              onClick={() => setShowHelpModal(true)}
+              className="absolute top-4 right-4 flex items-center gap-1 px-3 py-2 bg-[#2c74b3] text-white hover:bg-[#235d8f] rounded-lg transition-colors duration-200 text-sm"
+            >
+              <Question className="w-4 h-4" />
+              <span className="hidden sm:inline">Help</span>
+            </button>
+
+            {/* Step Content */}
+            <div className="min-h-96">{renderCurrentStep()}</div>
+          </div>
+
+          {/* Navigation Footer */}
+          <div className="bg-gray-50 px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <Button
+                variant="secondary"
+                onClick={handleBack}
+                disabled={currentStepIndex === 0}
+                className={currentStepIndex === 0 ? "invisible" : "visible"}
+                leftIcon={<ArrowLeft size={16} />}
+              >
+                <span className="hidden sm:inline">Back</span>
+              </Button>
+
+              <div className="flex items-center gap-3">
+                {currentStepIndex < wizardSteps.length - 1 ? (
+                  <Button
+                    onClick={handleNext}
+                    rightIcon={<ArrowRight size={16} />}
+                  >
+                    <span className="hidden sm:inline">Next Step</span>
+                    <span className="sm:hidden">Next</span>
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    className="bg-green-600 hover:bg-green-700"
+                    leftIcon={<Check size={16} />}
+                  >
+                    <span className="hidden sm:inline">Submit Request</span>
+                    <span className="sm:hidden">Submit</span>
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Footer */}
+        <div className="text-center mt-8 text-xs sm:text-sm text-gray-500">
+          <p>
+            By continuing, you agree to our{" "}
+            <a href="#" className="text-[#2c74b3] hover:underline">
+              Terms of Service
+            </a>{" "}
+            and{" "}
+            <a href="#" className="text-[#2c74b3] hover:underline">
+              Privacy Policy
+            </a>
+          </p>
+        </div>
+
+        {/* Help Modal */}
+        <HelpModal
+          isOpen={showHelpModal}
+          onClose={() => setShowHelpModal(false)}
+        />
       </div>
     </div>
   );
+};
+
+// Helper function for step help text
+const getStepHelpText = (stepId: string): string => {
+  const helpTexts = {
+    zip: "Enter your ZIP code so we can connect you with local professionals who serve your area.",
+    service:
+      "Select HVAC for heating and cooling systems, or Electrical for electrical work and installations.",
+    "heat-source":
+      "Choose between Gas/Electric systems (separate heating and cooling) or Full Electric heat pumps (combined heating and cooling).",
+    "system-details":
+      "Tell us about your installation preferences - indoor and outdoor unit locations, and any specific requirements.",
+    "square-feet":
+      "Select your home size range to help us calculate the right system capacity and provide accurate cost estimates.",
+    "estimate-price":
+      "This preliminary estimate is based on your home size and system preferences. Final quotes from professionals may vary based on site conditions.",
+    "home-details":
+      "Provide your home type and address so contractors can prepare accurate quotes for your property.",
+    address:
+      "Enter your property address so contractors can prepare accurate quotes and plan their visit.",
+    timeline:
+      "Let us know when you need the work completed. This helps us match you with available professionals.",
+  };
+  return helpTexts[stepId as keyof typeof helpTexts] || "";
 };
 
 export default CreateProject;

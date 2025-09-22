@@ -15,7 +15,6 @@ import {
   Projects,
   ProjectDetail,
   VendorOnboarding,
-  AdminPanel,
 } from "@/pages";
 
 // Protected Route Component
@@ -62,27 +61,17 @@ const App = () => {
           <Route path="dashboard" element={<Dashboard />} />
 
           {/* Customer Routes */}
-          <Route
-            path="create-project"
-            element={
-              <ProtectedRoute allowedRoles={["customer"]}>
-                <CreateProject />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Admin Routes */}
-          <Route
-            path="admin"
-            element={
-              <ProtectedRoute allowedRoles={["admin"]}>
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
         </Route>
-
         {/* Vendor Protected Routes (with Vendor Sidebar) */}
+
+        <Route
+          path="create-project"
+          element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <CreateProject />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/"
           element={

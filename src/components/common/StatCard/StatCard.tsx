@@ -1,5 +1,5 @@
 import { Card } from "@/components/core";
-import { StatCardProps } from "@/pages/Dashboard/interfaces";
+import { type StatCardProps } from "@/pages/Dashboard/interfaces";
 
 const StatCard = ({
   icon: Icon,
