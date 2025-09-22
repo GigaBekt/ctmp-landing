@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useAuthStore } from "@/stores/auth";
+// import { useAuthStore } from "@/stores/auth";
 import { Layout, DashboardLayout, VendorDashboardLayout } from "@/components";
 import {
   Home,
@@ -20,20 +20,20 @@ import {
 // Protected Route Component
 const ProtectedRoute = ({
   children,
-  allowedRoles,
-}: {
+}: // allowedRoles,
+{
   children: React.ReactNode;
   allowedRoles?: string[];
 }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  // const { isAuthenticated, user } = useAuthStore();
 
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
+  // if (!isAuthenticated) {
+  //   return <Navigate to="/login" replace />;
+  // }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  //   return <Navigate to="/dashboard" replace />;
+  // }
 
   return <>{children}</>;
 };
