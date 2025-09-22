@@ -1,0 +1,10 @@
+// Export all pages from their respective folders
+export { default as Home } from "./Home";
+export { default as Login } from "./Login";
+export { default as Register } from "./Register";
+export { default as Dashboard } from "./Dashboard";
+export { default as CreateProject } from "./CreateProject";
+export { default as Projects } from "./Projects";
+export { default as ProjectDetail } from "./ProjectDetail";
+export { default as VendorOnboarding } from "./VendorOnboarding";
+export { default as AdminPanel } from "./AdminPanel";

@@ -285,3 +285,12 @@ Internationalization (i18n)
   Refer to industry-standard guidelines and stay updated with latest UI/UX trends and best practices.
 
 always use yarn for install pacakges
+
+folder structure must be like this:
+
+folderName/
+fileName.tsx
+interface/index.ts
+index.ts - for import componenet
+
+always use react phosphor icons for documentation https://phosphoricons.com/

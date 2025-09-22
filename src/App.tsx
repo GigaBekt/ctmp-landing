@@ -1,35 +1,108 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { useAuthStore } from "@/stores/auth";
+import { Layout, DashboardLayout, VendorDashboardLayout } from "@/components";
+import {
+  Home,
+  Login,
+  Register,
+  Dashboard,
+  CreateProject,
+  Projects,
+  ProjectDetail,
+  VendorOnboarding,
+  AdminPanel,
+} from "@/pages";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Protected Route Component
+const ProtectedRoute = ({
+  children,
+  allowedRoles,
+}: {
+  children: React.ReactNode;
+  allowedRoles?: string[];
+}) => {
+  const { isAuthenticated, user } = useAuthStore();
 
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <Routes>
+        {/* Public Routes (without Sidebar) */}
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="login" element={<Login />} />
+          <Route path="register" element={<Register />} />
+        </Route>
 
-export default App
+        {/* Customer Protected Routes (with Customer Sidebar) */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute allowedRoles={["customer", "admin"]}>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="dashboard" element={<Dashboard />} />
+
+          {/* Customer Routes */}
+          <Route
+            path="create-project"
+            element={
+              <ProtectedRoute allowedRoles={["customer"]}>
+                <CreateProject />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Admin Routes */}
+          <Route
+            path="admin"
+            element={
+              <ProtectedRoute allowedRoles={["admin"]}>
+                <AdminPanel />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        {/* Vendor Protected Routes (with Vendor Sidebar) */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute allowedRoles={["vendor"]}>
+              <VendorDashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="vendor-onboarding" element={<VendorOnboarding />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="my-projects" element={<Projects />} />
+          <Route path="team" element={<Projects />} />
+          <Route path="projects/:id" element={<ProjectDetail />} />
+        </Route>
+
+        {/* Catch all route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;
