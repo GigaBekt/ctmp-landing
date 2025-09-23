@@ -3,14 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=23.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "engines": {
-      "node": ">=23.0.0"
-    }
+    "preview": "vite preview"
   },
   "dependencies": {
     "@types/node": "^24.5.2",
