@@ -20,6 +20,7 @@ import {
   type UserType as UserTypeType,
   type AccountType as AccountTypeType,
 } from "@/api/auth/interface";
+import { authApi } from "@/api/auth/auth.api";
 
 interface FormData {
   userType: UserTypeType;
@@ -122,43 +123,104 @@ const RegisterForm = () => {
     }
   };
 
-  const handleCancelRegistration = () => {
-    setIsLoading(false);
-    setErrorMessage(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setErrorMessage("Passwords do not match.");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.accountType === AccountType.ORGANIZATION) {
-      if (!formData.organizationName.trim()) {
-        setErrorMessage("Organization name is required.");
+    try {
+      // Validation
+      if (formData.password !== formData.confirmPassword) {
+        setErrorMessage("Passwords do not match.");
         setIsLoading(false);
         return;
       }
-      if (!formData.organizationCode.trim()) {
-        setErrorMessage("Registration code is required.");
-        setIsLoading(false);
-        return;
-      }
-    }
 
-    // Mock loading for visual purposes
-    setTimeout(() => {
+      if (formData.accountType === AccountType.ORGANIZATION) {
+        if (!formData.organizationName.trim()) {
+          setErrorMessage("Organization name is required.");
+          setIsLoading(false);
+          return;
+        }
+        if (!formData.organizationCode.trim()) {
+          setErrorMessage("Registration code is required.");
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // Prepare registration data based on user type and account type
+      const registrationData = {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        user_type: formData.userType,
+        account_type: formData.accountType,
+        email: formData.email,
+        phone: formData.phoneNumber,
+        password: formData.password,
+        password_confirmation: formData.confirmPassword,
+        ...(formData.accountType === AccountType.ORGANIZATION && {
+          organization_name: formData.organizationName,
+          organization_code: formData.organizationCode,
+        }),
+      };
+
+      // Call appropriate API based on user type and account type
+      let response;
+      if (
+        formData.userType === UserType.CUSTOMER &&
+        formData.accountType === AccountType.INDIVIDUAL
+      ) {
+        response = await authApi.registerCustomerIndividual(registrationData);
+      } else if (
+        formData.userType === UserType.CUSTOMER &&
+        formData.accountType === AccountType.ORGANIZATION
+      ) {
+        response = await authApi.registerCustomerOrganization({
+          ...registrationData,
+          organization_name: formData.organizationName,
+          organization_code: formData.organizationCode,
+        });
+      } else if (
+        formData.userType === UserType.VENDOR &&
+        formData.accountType === AccountType.ORGANIZATION
+      ) {
+        response = await authApi.registerVendorOrganization({
+          ...registrationData,
+          organization_name: formData.organizationName,
+          organization_code: formData.organizationCode,
+        });
+      } else {
+        throw new Error("Invalid user type and account type combination");
+      }
+
+      // Store token and user data
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      // Navigate based on user type
+      if (formData.userType === UserType.VENDOR) {
+        navigate("/vendor-dashboard");
+      } else {
+        navigate("/dashboard");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.error("Registration error:", error);
+
+      // Handle API errors
+      if (error.response?.data?.message) {
+        setErrorMessage(error.response.data.message);
+      } else if (error.response?.data?.errors) {
+        // Handle validation errors
+        const errorMessages = Object.values(error.response.data.errors).flat();
+        setErrorMessage(errorMessages.join(", "));
+      } else {
+        setErrorMessage("Registration failed. Please try again.");
+      }
+    } finally {
       setIsLoading(false);
-      // Mock navigation based on user type
-      navigate("/dashboard");
-      console.log("Register form submitted (visual only):", formData);
-    }, 3000);
+    }
   };
 
   return (
@@ -535,17 +597,6 @@ const RegisterForm = () => {
               </motion.button>
 
               {/* Cancel button - only show when loading */}
-              {isLoading && (
-                <motion.button
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  type="button"
-                  onClick={handleCancelRegistration}
-                  className="w-full bg-gray-500 text-white py-2 px-4 rounded-xl hover:bg-gray-600 transition-colors duration-200"
-                >
-                  Cancel Registration
-                </motion.button>
-              )}
 
               <div className="text-center">
                 <p className="text-gray-600">
