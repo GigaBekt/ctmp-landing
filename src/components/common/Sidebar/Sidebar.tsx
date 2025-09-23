@@ -17,7 +17,7 @@ const Sidebar = () => {
   const { user, logout } = useAuthStore();
   // Mock unread notifications count
   const unreadCount = 3;
-
+  console.log(user, "this is user for useAuthStore");
   // Define menu items with proper path matching
   const menuItems = useMemo(
     () => [
@@ -46,8 +46,10 @@ const Sidebar = () => {
   };
 
   const userProfile = {
-    name: user?.name || "User",
-    email: user?.email || "user@example.com",
+    name: JSON.parse(localStorage.getItem("user") || "{}")?.name || "User",
+    email:
+      JSON.parse(localStorage.getItem("user") || "{}")?.email ||
+      "user@example.com",
     avatar:
       "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=face&auto=format",
   };
