@@ -1,12 +1,15 @@
-declare enum UserType {
-  CUSTOMER = "customer",
-  VENDOR = "vendor",
-}
+export const UserType = {
+  CUSTOMER: "customer",
+  VENDOR: "vendor",
+} as const;
 
-declare enum AccountType {
-  INDIVIDUAL = "individual",
-  ORGANIZATION = "organization",
-}
+export const AccountType = {
+  INDIVIDUAL: "individual",
+  ORGANIZATION: "organization",
+} as const;
+
+export type UserType = (typeof UserType)[keyof typeof UserType];
+export type AccountType = (typeof AccountType)[keyof typeof AccountType];
 // User types
 export interface User {
   id: string;
@@ -58,7 +61,7 @@ export interface RegisterRequestCustomerIndividual {
   first_name: string;
   last_name: string;
   user_type: UserType;
-  account_type: string;
+  account_type: AccountType;
   email: string;
   phone: string;
   password: string;
@@ -69,7 +72,7 @@ export interface RegisterRequestCustomerOrganization {
   first_name: string;
   last_name: string;
   user_type: UserType;
-  account_type: string;
+  account_type: AccountType;
   email: string;
   phone: string;
   password: string;
@@ -82,7 +85,7 @@ export interface RegisterRequestVendorOrganization {
   first_name: string;
   last_name: string;
   user_type: UserType;
-  account_type: string;
+  account_type: AccountType;
   email: string;
   phone: string;
   password: string;

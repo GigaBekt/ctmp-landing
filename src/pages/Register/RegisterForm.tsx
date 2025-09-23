@@ -11,20 +11,31 @@ import {
   UserCircle,
   CaretRight,
   Phone,
+  IdentificationCard,
+  Hash,
 } from "phosphor-react";
+import {
+  UserType,
+  AccountType,
+  type UserType as UserTypeType,
+  type AccountType as AccountTypeType,
+} from "@/api/auth/interface";
 
 interface FormData {
-  userType: "customer" | "vendor";
+  userType: UserTypeType;
+  accountType: AccountTypeType;
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
   password: string;
   confirmPassword: string;
+  organizationName: string;
+  organizationCode: string;
 }
 
 const rightSideContent = {
-  customer: {
+  [UserType.CUSTOMER]: {
     title: "Find the right HVAC contractor",
     description:
       "Get competitive bids from certified HVAC professionals in your area",
@@ -39,7 +50,7 @@ const rightSideContent = {
       "Digital Project Management",
     ],
   },
-  vendor: {
+  [UserType.VENDOR]: {
     title: "Grow your HVAC business",
     description:
       "Connect with homeowners looking for HVAC installation and replacement services",
@@ -61,13 +72,16 @@ const RegisterForm = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
-    userType: "customer",
+    userType: UserType.CUSTOMER,
+    accountType: AccountType.INDIVIDUAL,
     firstName: "",
     lastName: "",
     email: "",
     phoneNumber: "",
     password: "",
     confirmPassword: "",
+    organizationName: "",
+    organizationCode: "",
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -86,8 +100,23 @@ const RegisterForm = () => {
     }
   };
 
-  const handleUserTypeChange = (userType: "customer" | "vendor") => {
-    setFormData((prev) => ({ ...prev, userType }));
+  const handleUserTypeChange = (userType: UserTypeType) => {
+    setFormData((prev) => ({
+      ...prev,
+      userType,
+      // If vendor is selected, automatically set to organization
+      accountType:
+        userType === UserType.VENDOR
+          ? AccountType.ORGANIZATION
+          : prev.accountType,
+    }));
+    if (errorMessage) {
+      setErrorMessage(null);
+    }
+  };
+
+  const handleAccountTypeChange = (accountType: AccountTypeType) => {
+    setFormData((prev) => ({ ...prev, accountType }));
     if (errorMessage) {
       setErrorMessage(null);
     }
@@ -103,17 +132,30 @@ const RegisterForm = () => {
     setIsLoading(true);
     setErrorMessage(null);
 
+    // Validation
     if (formData.password !== formData.confirmPassword) {
       setErrorMessage("Passwords do not match.");
       setIsLoading(false);
       return;
     }
 
+    if (formData.accountType === AccountType.ORGANIZATION) {
+      if (!formData.organizationName.trim()) {
+        setErrorMessage("Organization name is required.");
+        setIsLoading(false);
+        return;
+      }
+      if (!formData.organizationCode.trim()) {
+        setErrorMessage("Registration code is required.");
+        setIsLoading(false);
+        return;
+      }
+    }
+
     // Mock loading for visual purposes
     setTimeout(() => {
       setIsLoading(false);
       // Mock navigation based on user type
-
       navigate("/dashboard");
       console.log("Register form submitted (visual only):", formData);
     }, 3000);
@@ -148,43 +190,105 @@ const RegisterForm = () => {
             )}
             {/* User Type Selection */}
             <div className="space-y-2">
+              <label className="block text-base font-semibold text-gray-900 mb-3">
+                I am a
+              </label>
               <div className="grid grid-cols-2 gap-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="button"
-                  onClick={() => handleUserTypeChange("customer")}
+                  onClick={() => handleUserTypeChange(UserType.CUSTOMER)}
                   className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                    formData.userType === "customer"
+                    formData.userType === UserType.CUSTOMER
                       ? "border-[#2c74b3] bg-blue-50 text-[#2c74b3]"
                       : "border-gray-200 hover:border-[#2c74b3] text-gray-600"
                   }`}
                 >
                   <UserCircle className="w-6 h-6" />
-                  <span className="font-medium">Customer</span>
+                  <span className="font-semibold text-sm">Customer</span>
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="button"
-                  onClick={() => handleUserTypeChange("vendor")}
+                  onClick={() => handleUserTypeChange(UserType.VENDOR)}
                   className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                    formData.userType === "vendor"
+                    formData.userType === UserType.VENDOR
                       ? "border-[#2c74b3] bg-blue-50 text-[#2c74b3]"
                       : "border-gray-200 hover:border-[#2c74b3] text-gray-600"
                   }`}
                 >
                   <Buildings className="w-6 h-6" />
-                  <span className="font-medium">Service Provider</span>
+                  <span className="font-semibold text-sm">
+                    Service Provider
+                  </span>
                 </motion.button>
               </div>
+            </div>
+
+            {/* Account Type Selection - Simplified */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                <div className="flex items-center gap-3">
+                  <Buildings className="w-5 h-5 text-gray-600" />
+                  <span className="text-sm font-semibold text-gray-900">
+                    Business Account
+                  </span>
+                </div>
+                <label
+                  className={`relative inline-flex items-center ${
+                    formData.userType === UserType.VENDOR
+                      ? "cursor-not-allowed opacity-60"
+                      : "cursor-pointer"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={formData.accountType === AccountType.ORGANIZATION}
+                    onChange={(e) =>
+                      handleAccountTypeChange(
+                        e.target.checked
+                          ? AccountType.ORGANIZATION
+                          : AccountType.INDIVIDUAL
+                      )
+                    }
+                    disabled={formData.userType === UserType.VENDOR}
+                    className="sr-only"
+                  />
+                  <div
+                    className={`w-12 h-7 rounded-full transition-colors duration-200 ${
+                      formData.accountType === AccountType.ORGANIZATION
+                        ? "bg-[#2c74b3]"
+                        : "bg-gray-300"
+                    } ${
+                      formData.userType === UserType.VENDOR ? "opacity-60" : ""
+                    }`}
+                  >
+                    <div
+                      className={`w-6 h-6 mt-[1.5px] bg-white rounded-full shadow-lg transform transition-transform duration-200 ${
+                        formData.accountType === AccountType.ORGANIZATION
+                          ? "translate-x-5"
+                          : "translate-x-0.5"
+                      }`}
+                    />
+                  </div>
+                </label>
+              </div>
+              <p className="text-xs font-normal text-gray-500 px-1">
+                {formData.userType === UserType.VENDOR
+                  ? "Service providers must register as a business"
+                  : formData.accountType === AccountType.ORGANIZATION
+                  ? "Registering as a business with organization details"
+                  : "Registering as an individual"}
+              </p>
             </div>
 
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
                   First Name
                 </label>
                 <div className="relative group">
@@ -261,6 +365,71 @@ const RegisterForm = () => {
                 />
               </div>
             </div>
+
+            {/* Organization Fields - Only show when Organization is selected */}
+            {formData.accountType === AccountType.ORGANIZATION && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-4"
+              >
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+                    <Buildings className="w-5 h-5 text-[#2c74b3]" />
+                    Organization Details
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Organization Name
+                      </label>
+                      <div className="relative group">
+                        <IdentificationCard className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-[#2c74b3] transition-colors w-5 h-5" />
+                        <input
+                          id="organizationName"
+                          name="organizationName"
+                          type="text"
+                          value={formData.organizationName}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#2c74b3] focus:ring-2 focus:ring-[#2c74b3] focus:ring-opacity-20 transition-all duration-200"
+                          placeholder="Acme HVAC Services Inc."
+                          required={
+                            formData.accountType === AccountType.ORGANIZATION
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Registration Code
+                      </label>
+                      <div className="relative group">
+                        <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-[#2c74b3] transition-colors w-5 h-5" />
+                        <input
+                          id="organizationCode"
+                          name="organizationCode"
+                          type="text"
+                          value={formData.organizationCode}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-[#2c74b3] focus:ring-2 focus:ring-[#2c74b3] focus:ring-opacity-20 transition-all duration-200"
+                          placeholder="123456789"
+                          required={
+                            formData.accountType === AccountType.ORGANIZATION
+                          }
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        Business registration or tax ID number
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Password Fields */}
             <div className="space-y-4">
@@ -414,8 +583,8 @@ const RegisterForm = () => {
       >
         <div className="absolute inset-0 bg-grid-white/[0.05]" />
 
-        <div className="relative h-full flex items-center justify-center p-12">
-          <div className="max-w-lg">
+        <div className="relative h-full  flex p-12 py-56">
+          <div className="mx-auto text-center">
             <h2 className="text-4xl font-bold text-white mb-6">
               {rightSideContent[formData.userType].title}
             </h2>
