@@ -21,6 +21,7 @@ import {
   type AccountType as AccountTypeType,
 } from "@/api/auth/interface";
 import { authApi } from "@/api/auth/auth.api";
+import { buildPath } from "@/routes/paths";
 
 interface FormData {
   userType: UserTypeType;
@@ -200,9 +201,9 @@ const RegisterForm = () => {
 
       // Navigate based on user type
       if (formData.userType === UserType.VENDOR) {
-        navigate("/vendor-dashboard");
+        navigate(buildPath.vendor.dashboard());
       } else {
-        navigate("/dashboard");
+        navigate(buildPath.customer.dashboard());
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
@@ -602,7 +603,7 @@ const RegisterForm = () => {
                 <p className="text-gray-600">
                   Already have an account?{" "}
                   <Link
-                    to="/login"
+                    to={buildPath.public.login()}
                     className="text-[#2c74b3] hover:text-[#235d8f] font-medium transition-colors"
                   >
                     Sign in

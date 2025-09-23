@@ -1,13 +1,10 @@
 import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
+  createBrowserRouter,
+  RouterProvider,
   Navigate,
 } from "react-router-dom";
-// import { useAuthStore } from "@/stores/auth";
 import { Layout, DashboardLayout, VendorDashboardLayout } from "@/components";
 import {
-  Home,
   Login,
   Register,
   Dashboard,
@@ -16,75 +13,143 @@ import {
   ProjectDetail,
   VendorOnboarding,
 } from "@/pages";
+import { type Account } from "@/api";
 
-// Protected Route Component
-const ProtectedRoute = ({
-  children,
-}: // allowedRoles,
-{
-  children: React.ReactNode;
-  allowedRoles?: string[];
-}) => {
-  // const { isAuthenticated, user } = useAuthStore();
+// Smart redirect component based on user type
+const SmartRedirect = () => {
+  // Check if user is logged in and has token
+  const token = localStorage.getItem("token");
+  const userString = localStorage.getItem("user");
 
-  // if (!isAuthenticated) {
-  //   return <Navigate to="/login" replace />;
-  // }
+  if (token && userString) {
+    try {
+      const userData = JSON.parse(userString);
 
-  // if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-  //   return <Navigate to="/dashboard" replace />;
-  // }
+      // Check if user has vendor organization
+      const hasVendorOrg = userData.accounts?.some(
+        (account: Account) => account.vendor_organization !== null
+      );
 
-  return <>{children}</>;
+      if (hasVendorOrg) {
+        return <Navigate to="/vendor/dashboard" replace />;
+      } else {
+        return <Navigate to="/dashboard" replace />;
+      }
+    } catch (error) {
+      console.error("Error parsing user data:", error);
+      // Clear invalid data
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      return <Login />;
+    }
+  }
+
+  // If not logged in, show home page
+  return <Login />;
 };
 
+// Protected Route Component
+// const ProtectedRoute = ({
+//   children,
+//   allowedRoles,
+// }: {
+//   children: React.ReactNode;
+//   allowedRoles?: string[];
+// }) => {
+//   // Temporarily disabled for development
+//   console.log("Allowed roles:", allowedRoles);
+//   return <>{children}</>;
+// };
+
+// Create router configuration
+const router = createBrowserRouter([
+  // Public Routes (without Sidebar)
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <SmartRedirect />,
+      },
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+      {
+        path: "create-project",
+        element: <CreateProject />,
+      },
+    ],
+  },
+  // Customer Protected Routes (with Customer Sidebar)
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+
+      {
+        path: "projects",
+        element: <Projects />,
+      },
+      {
+        path: "projects/:id",
+        element: <ProjectDetail />,
+      },
+    ],
+  },
+  // Vendor Protected Routes (with Vendor Sidebar)
+  {
+    path: "/vendor",
+    element: <VendorDashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/vendor/dashboard" replace />,
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "onboarding",
+        element: <VendorOnboarding />,
+      },
+      {
+        path: "projects",
+        element: <Projects />,
+      },
+      {
+        path: "my-projects",
+        element: <Projects />,
+      },
+      {
+        path: "team",
+        element: <Projects />,
+      },
+      {
+        path: "projects/:id",
+        element: <ProjectDetail />,
+      },
+    ],
+  },
+  // Catch all route
+  {
+    path: "*",
+    element: <Navigate to="/dashboard" replace />,
+  },
+]);
+
 const App = () => {
-  return (
-    <Router>
-      <Routes>
-        {/* Public Routes (without Sidebar) */}
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Register />} />
-        </Route>
-
-        {/* Customer Protected Routes (with Customer Sidebar) */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute allowedRoles={["customer", "admin"]}>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="dashboard" element={<Dashboard />} />
-
-          {/* Customer Routes */}
-        </Route>
-        {/* Vendor Protected Routes (with Vendor Sidebar) */}
-
-        <Route path="create-project" element={<CreateProject />} />
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute allowedRoles={["vendor"]}>
-              <VendorDashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="vendor-onboarding" element={<VendorOnboarding />} />
-          <Route path="projects" element={<Projects />} />
-          <Route path="my-projects" element={<Projects />} />
-          <Route path="team" element={<Projects />} />
-          <Route path="projects/:id" element={<ProjectDetail />} />
-        </Route>
-
-        {/* Catch all route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default App;

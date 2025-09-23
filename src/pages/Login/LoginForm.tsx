@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Envelope, Eye, EyeSlash, Lock } from "phosphor-react";
+import { authApi } from "@/api";
+import { AccountType } from "@/api/auth/interface";
 
 interface LoginFormData {
   email: string;
@@ -22,13 +24,21 @@ const LoginForm = () => {
     setIsLoading(true);
     setErrorMessage(null);
 
-    // Mock loading for visual purposes
-    setTimeout(() => {
+    try {
+      const response = await authApi.login(formData);
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+      if (response.data.user.accounts[0].type === AccountType.INDIVIDUAL) {
+        navigate("/dashboard");
+      } else {
+        navigate("/vendor/dashboard");
+      }
       setIsLoading(false);
-      // Mock navigation would happen here
-      navigate("/dashboard");
-      console.log("Login form submitted (visual only):", formData);
-    }, 2000);
+    } catch (error) {
+      console.error("Login error:", error);
+      setIsLoading(false);
+      setErrorMessage("Invalid email or password");
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
