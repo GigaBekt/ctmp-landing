@@ -11,10 +11,11 @@ import {
 } from "phosphor-react";
 import { UserProfile } from "@/components/common";
 import { useAuthStore } from "@/stores/auth";
+import { type User as IUser } from "@/api/auth/interface";
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, clearAuth } = useAuthStore();
   // Mock unread notifications count
   const unreadCount = 3;
   console.log(user, "this is user for useAuthStore");
@@ -40,18 +41,9 @@ const Sidebar = () => {
   );
 
   const handleLogout = () => {
-    logout();
+    clearAuth();
     localStorage.clear();
     navigate("/login");
-  };
-
-  const userProfile = {
-    name: JSON.parse(localStorage.getItem("user") || "{}")?.name || "User",
-    email:
-      JSON.parse(localStorage.getItem("user") || "{}")?.email ||
-      "user@example.com",
-    avatar:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=48&h=48&fit=crop&crop=face&auto=format",
   };
 
   return (
@@ -66,7 +58,7 @@ const Sidebar = () => {
       </div>
 
       <div className="px-4 py-6 border-b border-gray-100">
-        <UserProfile user={userProfile} />
+        <UserProfile user={user as IUser} />
       </div>
 
       <nav className="flex-1 px-3 py-6 overflow-y-auto">

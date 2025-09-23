@@ -22,6 +22,7 @@ import {
 } from "@/api/auth/interface";
 import { authApi } from "@/api/auth/auth.api";
 import { buildPath } from "@/routes/paths";
+import { useAuthStore } from "@/stores/auth";
 
 interface FormData {
   userType: UserTypeType;
@@ -72,7 +73,6 @@ const rightSideContent = {
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     userType: UserType.CUSTOMER,
     accountType: AccountType.INDIVIDUAL,
@@ -87,6 +87,9 @@ const RegisterForm = () => {
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Auth store
+  const { setUser, setLoading, isLoading, getUserRole } = useAuthStore();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -126,26 +129,26 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setErrorMessage(null);
 
     try {
       // Validation
       if (formData.password !== formData.confirmPassword) {
         setErrorMessage("Passwords do not match.");
-        setIsLoading(false);
+        setLoading(false);
         return;
       }
 
       if (formData.accountType === AccountType.ORGANIZATION) {
         if (!formData.organizationName.trim()) {
           setErrorMessage("Organization name is required.");
-          setIsLoading(false);
+          setLoading(false);
           return;
         }
         if (!formData.organizationCode.trim()) {
           setErrorMessage("Registration code is required.");
-          setIsLoading(false);
+          setLoading(false);
           return;
         }
       }
@@ -195,12 +198,12 @@ const RegisterForm = () => {
         throw new Error("Invalid user type and account type combination");
       }
 
-      // Store token and user data
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
+      // Store user data in auth store
+      setUser(response);
 
-      // Navigate based on user type
-      if (formData.userType === UserType.VENDOR) {
+      // Navigate based on user role
+      const userRole = getUserRole();
+      if (userRole === "vendor") {
         navigate(buildPath.vendor.dashboard());
       } else {
         navigate(buildPath.customer.dashboard());
@@ -219,8 +222,7 @@ const RegisterForm = () => {
       } else {
         setErrorMessage("Registration failed. Please try again.");
       }
-    } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
