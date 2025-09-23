@@ -1,3 +1,12 @@
+declare enum UserType {
+  CUSTOMER = "customer",
+  VENDOR = "vendor",
+}
+
+declare enum AccountType {
+  INDIVIDUAL = "individual",
+  ORGANIZATION = "organization",
+}
 // User types
 export interface User {
   id: string;
@@ -16,7 +25,7 @@ export interface User {
 
 export interface Account {
   id: string;
-  type: "individual" | "organization";
+  type: AccountType;
   type_label: string;
   display_name: string;
   default_email: string | null;
@@ -48,7 +57,7 @@ export interface LoginRequest {
 export interface RegisterRequestCustomerIndividual {
   first_name: string;
   last_name: string;
-  user_type: string;
+  user_type: UserType;
   account_type: string;
   email: string;
   phone: string;
@@ -59,7 +68,7 @@ export interface RegisterRequestCustomerIndividual {
 export interface RegisterRequestCustomerOrganization {
   first_name: string;
   last_name: string;
-  user_type: string;
+  user_type: UserType;
   account_type: string;
   email: string;
   phone: string;
@@ -72,7 +81,7 @@ export interface RegisterRequestCustomerOrganization {
 export interface RegisterRequestVendorOrganization {
   first_name: string;
   last_name: string;
-  user_type: string;
+  user_type: UserType;
   account_type: string;
   email: string;
   phone: string;
