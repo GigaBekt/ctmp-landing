@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Envelope, Eye, EyeSlash, Lock } from "phosphor-react";
 import { authApi } from "@/api";
-import { AccountType } from "@/api/auth/interface";
+import { useAuthStore } from "@/stores/auth";
+import { buildPath } from "@/routes/paths";
 
 interface LoginFormData {
   email: string;
@@ -12,32 +13,51 @@ interface LoginFormData {
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Auth store
+  const { setUser, setLoading, isLoading, getUserRole } = useAuthStore();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setLoading(true);
     setErrorMessage(null);
 
     try {
       const response = await authApi.login(formData);
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.user));
-      if (response.data.user.accounts[0].type === AccountType.INDIVIDUAL) {
-        navigate("/dashboard");
+
+      // Store user data in auth store
+      setUser(response);
+
+      // Navigate based on user role
+      const userRole = getUserRole();
+      if (userRole === "vendor") {
+        navigate(buildPath.vendor.dashboard());
       } else {
-        navigate("/vendor/dashboard");
+        navigate(buildPath.customer.dashboard());
       }
-      setIsLoading(false);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Login error:", error);
-      setIsLoading(false);
-      setErrorMessage("Invalid email or password");
+      setLoading(false);
+
+      // Handle API errors
+      if (error && typeof error === "object" && "response" in error) {
+        const apiError = error as {
+          response?: { data?: { message?: string } };
+        };
+        if (apiError.response?.data?.message) {
+          setErrorMessage(apiError.response.data.message);
+        } else {
+          setErrorMessage("Invalid email or password");
+        }
+      } else {
+        setErrorMessage("Invalid email or password");
+      }
     }
   };
 
