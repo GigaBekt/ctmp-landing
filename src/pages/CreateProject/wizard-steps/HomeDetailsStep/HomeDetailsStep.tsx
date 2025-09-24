@@ -1,15 +1,14 @@
 import { useState } from "react";
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header, SelectableInput } from "../../components";
 
 const homeTypes = [
-  { id: "single-family", name: "Single-family home" },
   { id: "townhouse", name: "Townhouse" },
-  { id: "condo", name: "Condominium" },
-  { id: "apartment", name: "Apartment" },
   { id: "mobile-home", name: "Mobile home" },
   { id: "other", name: "Other" },
 ];
 
-const HomeDetailsStep = () => {
+const HomeDetailsStep = ({ title, subTitle }: IWizardStepsProps) => {
   const [selectedHomeType, setSelectedHomeType] = useState("");
   const [otherText, setOtherText] = useState("");
 
@@ -22,34 +21,16 @@ const HomeDetailsStep = () => {
 
   return (
     <div className="max-w-lg mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          What type of property is this?
-        </h2>
-      </div>
-
+      <Header title={title} subTitle={subTitle} />
       <div className="space-y-3">
         {homeTypes.map((homeType) => (
-          <label
+          <SelectableInput
             key={homeType.id}
-            className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-              selectedHomeType === homeType.id
-                ? "border-[#2c74b3] bg-blue-50"
-                : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
-          >
-            <input
-              type="radio"
-              name="homeType"
-              value={homeType.id}
-              checked={selectedHomeType === homeType.id}
-              onChange={(e) => handleHomeTypeSelect(e.target.value)}
-              className="w-5 h-5 text-[#2c74b3] border-gray-300 focus:ring-0"
-            />
-            <span className="ml-3 text-gray-700 font-medium">
-              {homeType.name}
-            </span>
-          </label>
+            id={homeType.id}
+            selected={selectedHomeType}
+            onChange={handleHomeTypeSelect}
+            name={homeType.name}
+          />
         ))}
       </div>
 

@@ -1,11 +1,9 @@
 import { CheckCircle, Info, TrendUp } from "phosphor-react";
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header } from "../../components";
+import { formatPrice } from "./estimate-helper";
 
-interface EstimatePriceStepProps {
-  onNext: () => void;
-  onBack: () => void;
-}
-
-const EstimatePriceStep = ({}: EstimatePriceStepProps) => {
+const EstimatePriceStep = ({ title, subTitle }: IWizardStepsProps) => {
   // Mock price calculation
   const priceEstimate = {
     low: 3800,
@@ -13,25 +11,9 @@ const EstimatePriceStep = ({}: EstimatePriceStepProps) => {
     average: 4500,
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price);
-  };
-
   return (
     <div className="max-w-3xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Estimated Project Cost
-        </h2>
-        <p className="text-gray-600">
-          Based on your home size and system preferences
-        </p>
-      </div>
+      <Header title={title} subTitle={subTitle} />
 
       <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
         {/* Main Price Display */}

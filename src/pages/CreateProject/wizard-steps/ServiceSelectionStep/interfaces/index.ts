@@ -1,4 +1,5 @@
 export interface ServiceSelectionStepProps {
+  title: string;
   onNext: () => void;
   onBack: () => void;
 }

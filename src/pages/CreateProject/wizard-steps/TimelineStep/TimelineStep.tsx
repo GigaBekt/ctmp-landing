@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Calendar, Clock, Lightning } from "phosphor-react";
-
-interface TimelineStepProps {
-  onNext: () => void;
-  onBack: () => void;
-}
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header } from "../../components";
 
 const timelineOptions = [
   {
@@ -33,17 +30,12 @@ const timelineOptions = [
   },
 ];
 
-const TimelineStep = ({}: TimelineStepProps) => {
+const TimelineStep = ({ title, subTitle }: IWizardStepsProps) => {
   const [selectedTimeline, setSelectedTimeline] = useState("");
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          When do you need this work done?
-        </h2>
-        <p className="text-gray-600">Choose your preferred timeline</p>
-      </div>
+      <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-4">
         {timelineOptions.map((option) => (

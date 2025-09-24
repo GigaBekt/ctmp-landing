@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { type ServiceSelectionStepProps, type ServiceOption } from "./interfaces";
+import { type Service } from "@/api/services/interface";
 
-const services: ServiceOption[] = [
-  { id: "air-conditioning", name: "Air conditioning" },
-  { id: "heating", name: "Heating" },
-  { id: "thermostat", name: "Thermostat and accessories" },
-  { id: "other-hvac", name: "Other HVAC services" },
-  { id: "other", name: "Other" },
-];
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header, SelectableInput } from "../../components";
 
-const ServiceSelectionStep = ({}: ServiceSelectionStepProps) => {
+interface ServiceSelectionStepProps {
+  services?: Service[];
+}
+
+const ServiceSelectionStep = ({
+  title,
+  subTitle,
+  services = [],
+}: IWizardStepsProps & ServiceSelectionStepProps) => {
   const [selectedService, setSelectedService] = useState("");
   const [otherText, setOtherText] = useState("");
 
@@ -19,34 +22,17 @@ const ServiceSelectionStep = ({}: ServiceSelectionStepProps) => {
 
   return (
     <div className="max-w-lg mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          What do you need help with?
-        </h2>
-      </div>
+      <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-3">
         {services.map((serviceOption) => (
-          <label
+          <SelectableInput
             key={serviceOption.id}
-            className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-              selectedService === serviceOption.id
-                ? "border-[#2c74b3] bg-blue-50"
-                : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
-          >
-            <input
-              type="radio"
-              name="service"
-              value={serviceOption.id}
-              checked={selectedService === serviceOption.id}
-              onChange={(e) => handleServiceSelect(e.target.value)}
-              className="w-5 h-5 text-[#2c74b3] border-gray-300 focus:ring-0"
-            />
-            <span className="ml-3 text-gray-700 font-medium">
-              {serviceOption.name}
-            </span>
-          </label>
+            id={serviceOption.id}
+            selected={selectedService}
+            onChange={handleServiceSelect}
+            name={serviceOption.name}
+          />
         ))}
       </div>
 

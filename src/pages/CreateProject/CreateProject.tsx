@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   MapPin,
@@ -27,7 +27,18 @@ import {
   AddressStep,
   TimelineStep,
   HelpModal,
+  StageOptionsStep,
+  SeerOptionsStep,
 } from "./wizard-steps";
+import { serviceApi, hvacServiceApi } from "@/api";
+import type { Service } from "@/api/services/interface";
+import type {
+  HeatSource,
+  InstallLocation,
+  InstallSpot,
+  SeerOption,
+  UnitVolume,
+} from "@/api/services/interface/hvac-interfaces";
 
 // Wizard steps with components
 const wizardSteps = [
@@ -53,6 +64,8 @@ const wizardSteps = [
     component: HeatSourceStep,
   },
   {
+    // intalattion location
+    // get install locations and install spots
     id: "system-details",
     icon: Lightning,
     title: "System Installation",
@@ -60,6 +73,7 @@ const wizardSteps = [
     component: SystemDetailsStep,
   },
   {
+    // get unit volumes
     id: "square-feet",
     icon: Ruler,
     title: "Home Size",
@@ -67,6 +81,7 @@ const wizardSteps = [
     component: SquareFeetStep,
   },
   {
+    // get estimate price
     id: "estimate-price",
     icon: CurrencyDollar,
     title: "Estimated Cost",
@@ -74,6 +89,7 @@ const wizardSteps = [
     component: EstimatePriceStep,
   },
   {
+    //! get home types we dont have this API
     id: "home-details",
     icon: House,
     title: "Home Type",
@@ -87,7 +103,26 @@ const wizardSteps = [
     subtitle: "Where is your property located?",
     component: AddressStep,
   },
+
+  // add seer options
+  // add stage options
+  // add photos
   {
+    id: "stage-options",
+    icon: Calendar,
+    title: "Stage Options",
+    subtitle: "Choose your preferred stage",
+    component: StageOptionsStep,
+  },
+  {
+    id: "seer-options",
+    icon: Calendar,
+    title: "Seer Options",
+    subtitle: "Choose your preferred seer",
+    component: SeerOptionsStep,
+  },
+  {
+    //! get timeline we dont have this API
     id: "timeline",
     icon: Calendar,
     title: "When do you need this work done?",
@@ -102,7 +137,61 @@ const CreateProject = () => {
   const [showHelp] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
 
+  // API Data State
+  const [services, setServices] = useState<Service[]>([]);
+  const [heatSources, setHeatSources] = useState<HeatSource[]>([]);
+  const [unitVolumes, setUnitVolumes] = useState<UnitVolume[]>([]);
+  const [installSpots, setInstallSpots] = useState<InstallSpot[]>([]);
+  const [installLocations, setInstallLocations] = useState<InstallLocation[]>(
+    []
+  );
+  const [stageOptions, setStageOptions] = useState<SeerOption[]>([]);
+  const [seerOptions, setSeerOptions] = useState<SeerOption[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(true);
+
   const currentStep = wizardSteps[currentStepIndex];
+
+  // Fetch all required data on component mount
+  useEffect(() => {
+    const fetchAllData = async () => {
+      try {
+        setIsLoadingData(true);
+
+        // Fetch all API data in parallel
+        const [
+          servicesResponse,
+          heatSourcesResponse,
+          unitVolumesResponse,
+          installSpotsResponse,
+          installLocationsResponse,
+          stageOptionsResponse,
+          seerOptionsResponse,
+        ] = await Promise.all([
+          serviceApi.getServices(),
+          hvacServiceApi.heatSources(),
+          hvacServiceApi.unitVolumes(),
+          hvacServiceApi.installSpots(),
+          hvacServiceApi.installLocations(),
+          hvacServiceApi.stageOptions(),
+          hvacServiceApi.seerOptions(),
+        ]);
+
+        setServices(servicesResponse.data);
+        setHeatSources(heatSourcesResponse.data);
+        setUnitVolumes(unitVolumesResponse.data);
+        setInstallSpots(installSpotsResponse.data);
+        setInstallLocations(installLocationsResponse.data);
+        setStageOptions(stageOptionsResponse.data);
+        setSeerOptions(seerOptionsResponse.data);
+      } catch (error) {
+        console.error("Error fetching wizard data:", error);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    fetchAllData();
+  }, []);
 
   const handleNext = () => {
     if (currentStepIndex < wizardSteps.length - 1) {
@@ -125,7 +214,33 @@ const CreateProject = () => {
     const currentStep = wizardSteps[currentStepIndex];
     const StepComponent = currentStep.component;
 
-    return <StepComponent onNext={handleNext} onBack={handleBack} />;
+    // Show loading state while fetching data
+    if (isLoadingData) {
+      return (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2c74b3]"></div>
+          <span className="ml-3 text-gray-600">Loading...</span>
+        </div>
+      );
+    }
+
+    // Pass relevant data to each step
+    const stepProps = {
+      title: currentStep.title,
+      subTitle: currentStep.subtitle,
+      icon: currentStep.icon,
+      ...(currentStep.id === "service" && { services }),
+      ...(currentStep.id === "heat-source" && { heatSources }),
+      ...(currentStep.id === "system-details" && {
+        installSpots,
+        installLocations,
+      }),
+      ...(currentStep.id === "square-feet" && { unitVolumes }),
+      ...(currentStep.id === "stage-options" && { stageOptions }),
+      ...(currentStep.id === "seer-options" && { seerOptions }),
+    };
+
+    return <StepComponent {...stepProps} />;
   };
 
   return (

@@ -1,9 +1,7 @@
 import { useState } from "react";
 
-interface SquareFeetStepProps {
-  onNext: () => void;
-  onBack: () => void;
-}
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header, SelectableInput } from "../../components";
 
 const sizeRanges = [
   { id: "small", label: "Under 1,000 sq ft", range: "500-999" },
@@ -12,47 +10,23 @@ const sizeRanges = [
   { id: "extra-large", label: "Over 3,000 sq ft", range: "3000+" },
 ];
 
-const SquareFeetStep = ({}: SquareFeetStepProps) => {
+const SquareFeetStep = ({ title, subTitle }: IWizardStepsProps) => {
   const [selectedSize, setSelectedSize] = useState("");
   const [customSize, setCustomSize] = useState("");
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          What's your home's square footage?
-        </h2>
-        <p className="text-gray-600">
-          Select your home size range to help us calculate the right system
-          capacity
-        </p>
-      </div>
+      <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-3">
         {sizeRanges.map((size) => (
-          <label
+          <SelectableInput
             key={size.id}
-            className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-              selectedSize === size.id
-                ? "border-[#2c74b3] bg-blue-50"
-                : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
-          >
-            <div className="flex items-center">
-              <input
-                type="radio"
-                name="size"
-                value={size.id}
-                checked={selectedSize === size.id}
-                onChange={(e) => setSelectedSize(e.target.value)}
-                className="w-5 h-5 text-[#2c74b3] border-gray-300 focus:ring-0"
-              />
-              <span className="ml-3 text-gray-700 font-medium">
-                {size.label}
-              </span>
-            </div>
-            <span className="text-sm text-gray-500">{size.range} sq ft</span>
-          </label>
+            id={size.id}
+            selected={selectedSize}
+            onChange={setSelectedSize}
+            name={size.label}
+          />
         ))}
 
         {/* Custom Size Option */}

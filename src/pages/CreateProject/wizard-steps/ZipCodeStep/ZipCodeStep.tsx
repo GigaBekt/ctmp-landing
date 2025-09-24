@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Check } from "phosphor-react";
-import { type ZipCodeStepProps } from "./interfaces";
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header } from "../../components";
 
-const ZipCodeStep = ({}: ZipCodeStepProps) => {
+const ZipCodeStep = ({ title, subTitle }: IWizardStepsProps) => {
   const [zipCode, setZipCode] = useState("");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
@@ -28,46 +29,9 @@ const ZipCodeStep = ({}: ZipCodeStepProps) => {
     }
   };
 
-  // const fetchCounty = async () => {
-  //   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY; // Replace with your actual API key
-  //   const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${zipCode}&key=${apiKey}`;
-
-  //   try {
-  //     const response = await fetch(url);
-  //     const data = await response.json();
-
-  //     console.log(data, "this is data");
-
-  //     if (data.status === "OK" && data.results.length > 0) {
-  //       const addressComponents = data.results[0].address_components;
-  //       const countyComponent = addressComponents.find((component) =>
-  //         component.types.includes("administrative_area_level_2")
-  //       );
-  //       const stateComponent = addressComponents.find((component) =>
-  //         component.types.includes("administrative_area_level_1")
-  //       );
-
-  //       console.log(
-  //         { countyComponent, stateComponent },
-  //         "this is countyComponent"
-  //       );
-  //     } else {
-  //       console.log("err");
-  //     }
-  //   } catch (err) {
-  //     setError("Failed to fetch county data.");
-  //     console.error(err);
-  //   }
-  // };
-
   return (
     <div className="max-w-lg mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Enter the location of your project
-        </h2>
-      </div>
-
+      <Header title={title} subTitle={subTitle} />
       <div className="space-y-4">
         <label className="block text-sm font-medium text-gray-700">
           ZIP code
