@@ -18,4 +18,10 @@ export type {
   RegisterResponse,
   CurrentUserResponse,
   ApiError,
+  UserType,
+  AccountType,
 } from "./auth/interface";
+
+// Export services
+export { hvacServiceApi } from "./services/hvac-service.api";
+export { serviceApi } from "./services/service.api";

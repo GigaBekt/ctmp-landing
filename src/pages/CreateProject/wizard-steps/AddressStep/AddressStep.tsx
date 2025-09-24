@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { APIProvider } from "@vis.gl/react-google-maps";
 import AddressMapInput from "./AddressMapInput";
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header } from "../../components";
 
-const AddressStep = () => {
+const AddressStep = ({ title, subTitle }: IWizardStepsProps) => {
   const [address, setAddress] = useState("");
   const [addressError, setAddressError] = useState("");
 
@@ -28,11 +30,7 @@ const AddressStep = () => {
       libraries={["places"]}
     >
       <div className="max-w-lg mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Property Address
-          </h2>
-        </div>
+        <Header title={title} subTitle={subTitle} />
 
         <div className="space-y-4">
           <AddressMapInput

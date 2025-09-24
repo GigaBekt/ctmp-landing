@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { Calendar, Clock, Lightning } from "phosphor-react";
-
-interface TimelineStepProps {
-  onNext: () => void;
-  onBack: () => void;
-}
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header } from "../../components";
 
 const timelineOptions = [
   {
@@ -33,23 +30,18 @@ const timelineOptions = [
   },
 ];
 
-const TimelineStep = ({}: TimelineStepProps) => {
+const TimelineStep = ({ title, subTitle }: IWizardStepsProps) => {
   const [selectedTimeline, setSelectedTimeline] = useState("");
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          When do you need this work done?
-        </h2>
-        <p className="text-gray-600">Choose your preferred timeline</p>
-      </div>
+      <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-4">
         {timelineOptions.map((option) => (
           <label
             key={option.id}
-            className={`flex items-center p-6 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+            className={`flex items-center p-2 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
               selectedTimeline === option.id
                 ? "border-[#2c74b3] bg-blue-50"
                 : "border-gray-200 hover:border-gray-300 bg-white"
@@ -65,14 +57,14 @@ const TimelineStep = ({}: TimelineStepProps) => {
             />
 
             <div
-              className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 ${
+              className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 ${
                 selectedTimeline === option.id
                   ? "bg-[#2c74b3] text-white"
                   : option.bgColor
               }`}
             >
               <option.icon
-                size={24}
+                size={18}
                 className={
                   selectedTimeline === option.id ? "text-white" : option.color
                 }
@@ -80,10 +72,10 @@ const TimelineStep = ({}: TimelineStepProps) => {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-sm font-semibold text-gray-900 mb-1">
                 {option.name}
               </h3>
-              <p className="text-sm text-gray-600">{option.description}</p>
+              <p className="text-xs text-gray-600">{option.description}</p>
             </div>
           </label>
         ))}

@@ -1,17 +1,18 @@
 import { useState } from "react";
+import { type HeatSource } from "@/api/services/interface/hvac-interfaces";
+import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import { Header, SelectableInput } from "../../components";
 
-const systemTypes = [
-  { id: "install-central-ac", name: "Install central A/C" },
-  { id: "repair-central-ac", name: "Repair central A/C" },
-  { id: "window-ac-unit", name: "Window A/C Unit" },
-  {
-    id: "install-repair-air-cleaner",
-    name: "Install or repair central air cleaner",
-  },
-  { id: "other", name: "Other" },
-];
+interface HeatSourceStepProps {
+  title: string;
+  heatSources?: HeatSource[];
+}
 
-const HeatSourceStep = () => {
+const HeatSourceStep = ({
+  heatSources = [],
+  title,
+  subTitle,
+}: IWizardStepsProps & HeatSourceStepProps) => {
   const [selectedSystemType, setSelectedSystemType] = useState("");
   const [otherText, setOtherText] = useState("");
 
@@ -24,34 +25,17 @@ const HeatSourceStep = () => {
 
   return (
     <div className="max-w-lg mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          What kind of system do you have?
-        </h2>
-      </div>
+      <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-3">
-        {systemTypes.map((systemType) => (
-          <label
+        {heatSources.map((systemType) => (
+          <SelectableInput
             key={systemType.id}
-            className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-              selectedSystemType === systemType.id
-                ? "border-[#2c74b3] bg-blue-50"
-                : "border-gray-200 hover:border-gray-300 bg-white"
-            }`}
-          >
-            <input
-              type="radio"
-              name="systemType"
-              value={systemType.id}
-              checked={selectedSystemType === systemType.id}
-              onChange={(e) => handleSystemTypeSelect(e.target.value)}
-              className="w-5 h-5 text-[#2c74b3] border-gray-300 focus:ring-0"
-            />
-            <span className="ml-3 text-gray-700 font-medium">
-              {systemType.name}
-            </span>
-          </label>
+            id={systemType.id}
+            selected={selectedSystemType}
+            onChange={handleSystemTypeSelect}
+            name={systemType.name}
+          />
         ))}
       </div>
 
