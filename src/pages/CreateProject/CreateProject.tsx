@@ -104,8 +104,6 @@ const wizardSteps = [
     component: AddressStep,
   },
 
-  // add seer options
-  // add stage options
   // add photos
   {
     id: "stage-options",
@@ -240,6 +238,7 @@ const CreateProject = () => {
       ...(currentStep.id === "seer-options" && { seerOptions }),
     };
 
+    // @ts-expect-error - stepProps is typed correctly
     return <StepComponent {...stepProps} />;
   };
 

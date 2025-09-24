@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { type IWizardStepsProps } from "../Wizard-steps-interface";
 import { Header, SelectableInput } from "../../components";
 import type {
@@ -15,12 +15,37 @@ const SystemDetailsStep = ({
   installSpots: InstallSpot[];
   installLocations: InstallLocation[];
 }) => {
-  const [selectedOptions, setSelectedOptions] = useState<string>("");
+  const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [selectedSpots, setSelectedSpots] = useState<string[]>([]);
   const [customRequirements, setCustomRequirements] = useState("");
 
-  const handleOptionToggle = (option: string) => {
-    setSelectedOptions(option);
+  // Filter install spots based on selected location
+  const filteredInstallSpots = useMemo(() => {
+    if (!selectedLocation) return [];
+    return installSpots.filter(
+      (spot) => spot.hvac_install_location_id === selectedLocation
+    );
+  }, [selectedLocation, installSpots]);
+
+  const handleLocationSelect = (locationId: string) => {
+    setSelectedLocation(locationId);
+    setSelectedSpots([]); // Reset selected spots when location changes
   };
+
+  const handleSpotToggle = (spotId: string) => {
+    setSelectedSpots((prev) =>
+      prev.includes(spotId)
+        ? prev.filter((id) => id !== spotId)
+        : [...prev, spotId]
+    );
+  };
+
+  console.log({
+    installSpots,
+    installLocations,
+    selectedLocation,
+    filteredInstallSpots,
+  });
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -28,41 +53,56 @@ const SystemDetailsStep = ({
       <div className="space-y-6">
         {/* Installation Options */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Installation Requirements (select all that apply)
-          </h3>
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Install Locations
-            </h3>
-            {installLocations.map((option) => (
-              <SelectableInput
-                key={option.id}
-                id={option.id}
-                selected={selectedOptions}
-                onChange={handleOptionToggle}
-                name={option.name}
-              />
-            ))}
+          <div className="space-y-6">
+            {/* Install Locations */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Choose Installation Location
+              </h3>
+              <div className="space-y-3">
+                {installLocations.map((location) => (
+                  <SelectableInput
+                    key={location.id}
+                    id={location.id}
+                    selected={selectedLocation}
+                    onChange={handleLocationSelect}
+                    name={location.name}
+                  />
+                ))}
+              </div>
+            </div>
 
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Install Spots
-            </h3>
-            {installSpots.map((option) => (
-              <SelectableInput
-                key={option.id}
-                id={option.id}
-                selected={selectedOptions}
-                onChange={handleOptionToggle}
-                name={option.name}
-              />
-            ))}
+            {/* Install Spots - Only show when location is selected */}
+            {selectedLocation && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Choose Installation Spots
+                </h3>
+                <div className="space-y-3">
+                  {filteredInstallSpots.length > 0 ? (
+                    filteredInstallSpots.map((spot) => (
+                      <SelectableInput
+                        key={spot.id}
+                        id={spot.id}
+                        selected={selectedSpots.includes(spot.id)}
+                        onChange={handleSpotToggle}
+                        name={spot.name}
+                        isMultiple={true}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-gray-500 text-sm py-4">
+                      No installation spots available for the selected location.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Custom Requirements */}
-        {(selectedOptions === "Other (please specify)" ||
-          customRequirements) && (
+        {(selectedSpots.length > 0 || customRequirements) && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Additional Requirements or Specifications
