@@ -1,7 +1,8 @@
 import { api } from "../api";
-import {
-  type ServiceResponse,
-  type ServiceCategoryResponse,
+import type {
+  ServiceResponse,
+  ServiceCategoryResponse,
+  HomeTypeResponse,
 } from "./interface";
 
 export const serviceApi = {
@@ -16,6 +17,11 @@ export const serviceApi = {
     const response = await api.get<ServiceCategoryResponse>(
       `/services/${serviceId}/categories`
     );
+    return response.data;
+  },
+
+  getHomeTypes: async (): Promise<HomeTypeResponse> => {
+    const response = await api.get<HomeTypeResponse>("/services/home-types");
     return response.data;
   },
 };

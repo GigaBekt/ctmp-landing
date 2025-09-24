@@ -16,7 +16,7 @@ const SelectableInput = ({
   value,
 }: SelectableInputProps) => {
   const isSelected = isMultiple ? selected : selected === id;
-
+  console.log({ isSelected, selected, id });
   return (
     <label
       key={id}

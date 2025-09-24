@@ -11,7 +11,10 @@ const SquareFeetStep = ({
 }: IWizardStepsProps & { unitVolumes: UnitVolume[] }) => {
   const [selectedSize, setSelectedSize] = useState<UnitVolume | null>(null);
   const [customSize, setCustomSize] = useState("");
-  console.log({ unitVolumes, selectedSize });
+  const handleSizeSelect = (size: UnitVolume) => {
+    setSelectedSize(() => size);
+  };
+
   return (
     <div className="max-w-2xl mx-auto">
       <Header title={title} subTitle={subTitle} />
@@ -21,8 +24,8 @@ const SquareFeetStep = ({
           <SelectableInput
             key={size.id}
             id={size.id}
-            selected={selectedSize?.id === size.id}
-            onChange={setSelectedSize}
+            selected={selectedSize?.id ?? ""}
+            onChange={(e) => handleSizeSelect(e)}
             name={size.text}
             value={size}
           />

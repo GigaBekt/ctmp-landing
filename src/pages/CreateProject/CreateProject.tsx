@@ -31,7 +31,7 @@ import {
   SeerOptionsStep,
 } from "./wizard-steps";
 import { serviceApi, hvacServiceApi } from "@/api";
-import type { Service } from "@/api/services/interface";
+import type { HomeType, Service } from "@/api/services/interface";
 import type {
   HeatSource,
   InstallLocation,
@@ -89,7 +89,6 @@ const wizardSteps = [
     component: EstimatePriceStep,
   },
   {
-    //! get home types we dont have this API
     id: "home-details",
     icon: House,
     title: "Home Type",
@@ -146,6 +145,7 @@ const CreateProject = () => {
   );
   const [stageOptions, setStageOptions] = useState<SeerOption[]>([]);
   const [seerOptions, setSeerOptions] = useState<SeerOption[]>([]);
+  const [homeTypes, setHomeTypes] = useState<HomeType[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
   const currentStep = wizardSteps[currentStepIndex];
@@ -165,6 +165,7 @@ const CreateProject = () => {
           installLocationsResponse,
           stageOptionsResponse,
           seerOptionsResponse,
+          homeTypesResponse,
         ] = await Promise.all([
           serviceApi.getServices(),
           hvacServiceApi.heatSources(),
@@ -173,6 +174,7 @@ const CreateProject = () => {
           hvacServiceApi.installLocations(),
           hvacServiceApi.stageOptions(),
           hvacServiceApi.seerOptions(),
+          serviceApi.getHomeTypes(),
         ]);
 
         setServices(servicesResponse.data);
@@ -182,6 +184,7 @@ const CreateProject = () => {
         setInstallLocations(installLocationsResponse.data);
         setStageOptions(stageOptionsResponse.data);
         setSeerOptions(seerOptionsResponse.data);
+        setHomeTypes(homeTypesResponse.data);
       } catch (error) {
         console.error("Error fetching wizard data:", error);
       } finally {
@@ -237,6 +240,7 @@ const CreateProject = () => {
       ...(currentStep.id === "square-feet" && { unitVolumes }),
       ...(currentStep.id === "stage-options" && { stageOptions }),
       ...(currentStep.id === "seer-options" && { seerOptions }),
+      ...(currentStep.id === "home-details" && { homeTypes }),
     };
 
     // @ts-expect-error - stepProps is typed correctly

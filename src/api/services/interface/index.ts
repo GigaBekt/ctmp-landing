@@ -29,3 +29,16 @@ export interface ServiceCategory {
   created_at: string;
   updated_at: string;
 }
+
+export interface HomeTypeResponse {
+  message: string;
+  data: HomeType[];
+}
+export interface HomeType {
+  id: string;
+  name: string;
+  key: string;
+  projects_count: number;
+  created_at: string;
+  updated_at: string;
+}
