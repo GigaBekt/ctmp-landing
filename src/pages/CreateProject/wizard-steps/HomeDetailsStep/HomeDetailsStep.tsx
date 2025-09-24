@@ -20,7 +20,6 @@ const HomeDetailsStep = ({
     }
   };
 
-  //  I need to sort array like this other at the end
   const sortedHomeTypes = homeTypes.sort((a, b) => {
     if (a.key === "other") return 1;
     if (b.key === "other") return -1;
