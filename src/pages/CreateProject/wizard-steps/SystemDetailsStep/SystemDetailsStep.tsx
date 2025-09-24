@@ -37,13 +37,6 @@ const SystemDetailsStep = ({
     setSelectedSpots(spot);
   };
 
-  console.log({
-    installSpots,
-    installLocations,
-    selectedLocation,
-    filteredInstallSpots,
-  });
-
   return (
     <div className="max-w-2xl mx-auto">
       <Header title={title} subTitle={subTitle} />

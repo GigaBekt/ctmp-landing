@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { type HeatSource } from "@/api/services/interface/hvac-interfaces";
+import {
+  type HeatSource,
+  type HeatSourceChild,
+} from "@/api/services/interface/hvac-interfaces";
 import { type IWizardStepsProps } from "../Wizard-steps-interface";
 import { Header, SelectableInput } from "../../components";
 
@@ -13,15 +16,27 @@ const HeatSourceStep = ({
   title,
   subTitle,
 }: IWizardStepsProps & HeatSourceStepProps) => {
-  const [selectedSystemType, setSelectedSystemType] = useState("");
+  const [selectedSystemType, setSelectedSystemType] =
+    useState<HeatSource | null>(null);
+  const [selectedSystemTypeChild, setSelectedSystemTypeChild] =
+    useState<HeatSourceChild | null>(null);
   const [otherText, setOtherText] = useState("");
 
-  const handleSystemTypeSelect = (systemTypeId: string) => {
-    setSelectedSystemType(systemTypeId);
-    if (systemTypeId !== "other") {
-      setOtherText("");
-    }
+  const handleSystemTypeSelect = (systemType: HeatSource) => {
+    setSelectedSystemType(systemType);
+    // if (systemType.key !== "other") {
+    //   setOtherText("");
+    // }
   };
+
+  const handleSystemTypeSelectChild = (systemTypeChild: HeatSourceChild) => {
+    setSelectedSystemTypeChild(systemTypeChild);
+    // if (systemTypeChild.key !== "other") {
+    //   setOtherText("");
+    // }
+  };
+
+  console.log(selectedSystemTypeChild);
 
   return (
     <div className="max-w-lg mx-auto">
@@ -32,15 +47,34 @@ const HeatSourceStep = ({
           <SelectableInput
             key={systemType.id}
             id={systemType.id}
-            selected={selectedSystemType}
+            selected={selectedSystemType?.id ?? ""}
             onChange={handleSystemTypeSelect}
             name={systemType.name}
+            value={systemType}
           />
         ))}
       </div>
 
+      {/* render selected heat sorce children */}
+      {selectedSystemType && (
+        <div className="mt-6 space-y-3">
+          <h3 className="text-md font-medium text-gray-900 mb-4">
+            Choose System Type
+          </h3>
+          {selectedSystemType.children.map((child) => (
+            <SelectableInput
+              key={child.id}
+              id={child.id}
+              selected={selectedSystemTypeChild?.id ?? ""}
+              onChange={handleSystemTypeSelectChild}
+              name={child.name}
+              value={child}
+            />
+          ))}
+        </div>
+      )}
       {/* Other System Input */}
-      {selectedSystemType === "other" && (
+      {selectedSystemType?.key === "other" && (
         <div className="mt-6 space-y-3">
           <label className="block text-sm font-medium text-gray-700">
             Please specify your system type

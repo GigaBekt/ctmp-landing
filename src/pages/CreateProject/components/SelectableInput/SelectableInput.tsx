@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface SelectableInputProps {
   id: string | number;
   selected: string | boolean;
@@ -6,7 +8,6 @@ interface SelectableInputProps {
   isMultiple?: boolean;
   value?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
-
 const SelectableInput = ({
   id,
   selected,
@@ -16,7 +17,6 @@ const SelectableInput = ({
   value,
 }: SelectableInputProps) => {
   const isSelected = isMultiple ? selected : selected === id;
-  console.log({ isSelected, selected, id });
   return (
     <label
       key={id}
@@ -39,4 +39,4 @@ const SelectableInput = ({
   );
 };
 
-export default SelectableInput;
+export default memo(SelectableInput);

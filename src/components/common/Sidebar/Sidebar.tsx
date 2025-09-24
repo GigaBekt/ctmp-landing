@@ -18,7 +18,6 @@ const Sidebar = () => {
   const { user, clearAuth } = useAuthStore();
   // Mock unread notifications count
   const unreadCount = 3;
-  console.log(user, "this is user for useAuthStore");
   // Define menu items with proper path matching
   const menuItems = useMemo(
     () => [
