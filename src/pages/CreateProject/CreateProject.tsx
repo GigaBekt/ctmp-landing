@@ -14,6 +14,7 @@ import {
   Calendar,
   Ruler,
   CurrencyDollar,
+  Camera,
 } from "phosphor-react";
 import { Button } from "@/components";
 import {
@@ -29,6 +30,7 @@ import {
   HelpModal,
   StageOptionsStep,
   SeerOptionsStep,
+  UploadPhotosStep,
 } from "./wizard-steps";
 import { serviceApi, hvacServiceApi } from "@/api";
 import type { HomeType, Service } from "@/api/services/interface";
@@ -103,7 +105,6 @@ const wizardSteps = [
     component: AddressStep,
   },
 
-  // add photos
   {
     id: "seer-options",
     icon: Calendar,
@@ -119,6 +120,21 @@ const wizardSteps = [
     component: StageOptionsStep,
   },
 
+  // {
+  //   id: "manufacturer",
+  //   icon: Manufacturer,
+  //   title: "Manufacturer",
+  //   subtitle: "Choose your preferred manufacturer",
+  //   component: ManufacturerStep,
+  // },
+  {
+    id: "upload-photos",
+    icon: Camera,
+    title: "Upload Photos",
+    subtitle:
+      "Help us provide accurate quotes with photos of your current system",
+    component: UploadPhotosStep,
+  },
   {
     //! get timeline we dont have this API
     id: "timeline",
