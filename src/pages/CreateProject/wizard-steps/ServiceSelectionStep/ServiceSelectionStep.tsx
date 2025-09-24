@@ -16,8 +16,8 @@ const ServiceSelectionStep = ({
   const [selectedService, setSelectedService] = useState("");
   const [otherText, setOtherText] = useState("");
 
-  const handleServiceSelect = (serviceId: string) => {
-    setSelectedService(serviceId);
+  const handleServiceSelect = (serviceId: Service) => {
+    setSelectedService(serviceId.id);
   };
 
   return (
@@ -32,6 +32,7 @@ const ServiceSelectionStep = ({
             selected={selectedService}
             onChange={handleServiceSelect}
             name={serviceOption.name}
+            value={serviceOption}
           />
         ))}
       </div>

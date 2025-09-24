@@ -106,19 +106,20 @@ const wizardSteps = [
 
   // add photos
   {
-    id: "stage-options",
-    icon: Calendar,
-    title: "Stage Options",
-    subtitle: "Choose your preferred stage",
-    component: StageOptionsStep,
-  },
-  {
     id: "seer-options",
     icon: Calendar,
     title: "Seer Options",
     subtitle: "Choose your preferred seer",
     component: SeerOptionsStep,
   },
+  {
+    id: "stage-options",
+    icon: Calendar,
+    title: "Stage Options",
+    subtitle: "Choose your preferred stage",
+    component: StageOptionsStep,
+  },
+
   {
     //! get timeline we dont have this API
     id: "timeline",

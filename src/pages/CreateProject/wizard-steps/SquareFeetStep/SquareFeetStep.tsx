@@ -2,37 +2,36 @@ import { useState } from "react";
 
 import { type IWizardStepsProps } from "../Wizard-steps-interface";
 import { Header, SelectableInput } from "../../components";
+import type { UnitVolume } from "@/api/services/interface/hvac-interfaces";
 
-const sizeRanges = [
-  { id: "small", label: "Under 1,000 sq ft", range: "500-999" },
-  { id: "medium-small", label: "1,000 - 1,500 sq ft", range: "1000-1499" },
-
-  { id: "extra-large", label: "Over 3,000 sq ft", range: "3000+" },
-];
-
-const SquareFeetStep = ({ title, subTitle }: IWizardStepsProps) => {
-  const [selectedSize, setSelectedSize] = useState("");
+const SquareFeetStep = ({
+  title,
+  subTitle,
+  unitVolumes,
+}: IWizardStepsProps & { unitVolumes: UnitVolume[] }) => {
+  const [selectedSize, setSelectedSize] = useState<UnitVolume | null>(null);
   const [customSize, setCustomSize] = useState("");
-
+  console.log({ unitVolumes, selectedSize });
   return (
     <div className="max-w-2xl mx-auto">
       <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-3">
-        {sizeRanges.map((size) => (
+        {unitVolumes.map((size) => (
           <SelectableInput
             key={size.id}
             id={size.id}
-            selected={selectedSize}
+            selected={selectedSize?.id === size.id}
             onChange={setSelectedSize}
-            name={size.label}
+            name={size.text}
+            value={size}
           />
         ))}
 
         {/* Custom Size Option */}
         <label
           className={`flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-            selectedSize === "custom"
+            selectedSize?.id === "custom"
               ? "border-[#2c74b3] bg-blue-50"
               : "border-gray-200 hover:border-gray-300 bg-white"
           }`}
@@ -42,8 +41,17 @@ const SquareFeetStep = ({ title, subTitle }: IWizardStepsProps) => {
               type="radio"
               name="size"
               value="custom"
-              checked={selectedSize === "custom"}
-              onChange={(e) => setSelectedSize(e.target.value)}
+              checked={selectedSize?.id === "custom"}
+              onChange={() =>
+                setSelectedSize({
+                  id: "custom",
+                  text: "custom",
+                  tonnage: 0,
+                  projects_count: 0,
+                  created_at: "",
+                  updated_at: "",
+                })
+              }
               className="w-5 h-5 text-[#2c74b3] border-gray-300 focus:ring-0"
             />
             <span className="ml-3 text-gray-700 font-medium">
@@ -53,7 +61,7 @@ const SquareFeetStep = ({ title, subTitle }: IWizardStepsProps) => {
         </label>
       </div>
 
-      {selectedSize === "custom" && (
+      {selectedSize?.id === "custom" && (
         <div className="mt-6">
           <input
             type="number"

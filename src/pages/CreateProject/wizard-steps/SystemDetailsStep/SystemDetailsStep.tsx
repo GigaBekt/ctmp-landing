@@ -15,29 +15,26 @@ const SystemDetailsStep = ({
   installSpots: InstallSpot[];
   installLocations: InstallLocation[];
 }) => {
-  const [selectedLocation, setSelectedLocation] = useState<string>("");
-  const [selectedSpots, setSelectedSpots] = useState<string[]>([]);
+  const [selectedLocation, setSelectedLocation] =
+    useState<InstallLocation | null>(null);
+  const [selectedSpots, setSelectedSpots] = useState<InstallSpot | null>(null);
   const [customRequirements, setCustomRequirements] = useState("");
 
   // Filter install spots based on selected location
   const filteredInstallSpots = useMemo(() => {
     if (!selectedLocation) return [];
     return installSpots.filter(
-      (spot) => spot.hvac_install_location_id === selectedLocation
+      (spot) => spot.hvac_install_location_id === selectedLocation.id
     );
   }, [selectedLocation, installSpots]);
 
-  const handleLocationSelect = (locationId: string) => {
-    setSelectedLocation(locationId);
-    setSelectedSpots([]); // Reset selected spots when location changes
+  const handleLocationSelect = (location: InstallLocation) => {
+    setSelectedLocation(location);
+    setSelectedSpots(null); // Reset selected spots when location changes
   };
 
-  const handleSpotToggle = (spotId: string) => {
-    setSelectedSpots((prev) =>
-      prev.includes(spotId)
-        ? prev.filter((id) => id !== spotId)
-        : [...prev, spotId]
-    );
+  const handleSpotToggle = (spot: InstallSpot) => {
+    setSelectedSpots(spot);
   };
 
   console.log({
@@ -64,9 +61,10 @@ const SystemDetailsStep = ({
                   <SelectableInput
                     key={location.id}
                     id={location.id}
-                    selected={selectedLocation}
+                    selected={selectedLocation?.id || ""}
                     onChange={handleLocationSelect}
                     name={location.name}
+                    value={location}
                   />
                 ))}
               </div>
@@ -79,15 +77,16 @@ const SystemDetailsStep = ({
                   Choose Installation Spots
                 </h3>
                 <div className="space-y-3">
-                  {filteredInstallSpots.length > 0 ? (
+                  {filteredInstallSpots.length ? (
                     filteredInstallSpots.map((spot) => (
                       <SelectableInput
                         key={spot.id}
                         id={spot.id}
-                        selected={selectedSpots.includes(spot.id)}
+                        selected={selectedSpots?.id === spot.id || ""}
                         onChange={handleSpotToggle}
                         name={spot.name}
                         isMultiple={true}
+                        value={spot}
                       />
                     ))
                   ) : (
@@ -102,7 +101,7 @@ const SystemDetailsStep = ({
         </div>
 
         {/* Custom Requirements */}
-        {(selectedSpots.length > 0 || customRequirements) && (
+        {(selectedSpots?.id === "other" || customRequirements) && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Additional Requirements or Specifications

@@ -1,9 +1,10 @@
 interface SelectableInputProps {
-  id: string;
+  id: string | number;
   selected: string | boolean;
-  onChange: (value: string) => void;
+  onChange: (value: any) => void; // eslint-disable-line @typescript-eslint/no-explicit-any
   name: string;
   isMultiple?: boolean;
+  value?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 const SelectableInput = ({
@@ -12,6 +13,7 @@ const SelectableInput = ({
   onChange,
   name,
   isMultiple = false,
+  value,
 }: SelectableInputProps) => {
   const isSelected = isMultiple ? selected : selected === id;
 
@@ -27,9 +29,9 @@ const SelectableInput = ({
       <input
         type={isMultiple ? "checkbox" : "radio"}
         name={isMultiple ? `spot-${id}` : "service"}
-        value={id}
+        value={value || id}
         checked={Boolean(isSelected)}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(value || e.target.value)}
         className="w-5 h-5 text-[#2c74b3] border-gray-300 focus:ring-0"
       />
       <span className="ml-3 text-gray-700 font-medium">{name}</span>
