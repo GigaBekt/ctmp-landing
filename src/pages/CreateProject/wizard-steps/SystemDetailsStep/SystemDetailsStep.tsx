@@ -1,24 +1,45 @@
-import { useState, useMemo } from "react";
-import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import {
+  useState,
+  useMemo,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
+import {
+  type IWizardStepsProps,
+  type IWizardStepRef,
+} from "../Wizard-steps-interface";
 import { Header, SelectableInput } from "../../components";
+import { useWizardStore } from "@/stores";
+import { updateHvacDetails } from "@/api/create-project/hvac/hvac.update";
 import type {
   InstallSpot,
   InstallLocation,
 } from "@/api/services/interface/hvac-interfaces";
 
-const SystemDetailsStep = ({
-  title,
-  subTitle,
-  installSpots,
-  installLocations,
-}: IWizardStepsProps & {
-  installSpots: InstallSpot[];
-  installLocations: InstallLocation[];
-}) => {
+const SystemDetailsStep = forwardRef<
+  IWizardStepRef,
+  IWizardStepsProps & {
+    installSpots: InstallSpot[];
+    installLocations: InstallLocation[];
+  }
+>(({ title, subTitle, installSpots, installLocations }, ref) => {
   const [selectedLocation, setSelectedLocation] =
     useState<InstallLocation | null>(null);
   const [selectedSpots, setSelectedSpots] = useState<InstallSpot | null>(null);
   const [customRequirements, setCustomRequirements] = useState("");
+
+  // Wizard store
+  const { data, setSystemDetailsData } = useWizardStore();
+
+  // Load existing data from store
+  useEffect(() => {
+    if (data.systemDetails) {
+      setSelectedLocation(data.systemDetails.selectedLocation);
+      setSelectedSpots(data.systemDetails.selectedSpots);
+      setCustomRequirements(data.systemDetails.customRequirements);
+    }
+  }, [data.systemDetails]);
 
   // Filter install spots based on selected location
   const filteredInstallSpots = useMemo(() => {
@@ -37,6 +58,66 @@ const SystemDetailsStep = ({
     setSelectedSpots(spot);
   };
 
+  // Function to update system details
+  const handleUpdateSystemDetails = async (): Promise<boolean> => {
+    try {
+      if (data.projectId && selectedLocation && selectedSpots) {
+        await updateHvacDetails(data.projectId, {
+          hvac_install_location_id: selectedLocation.id,
+          hvac_install_spot_id: selectedSpots.id,
+          custom_install_location: customRequirements.trim() || undefined,
+        });
+        console.log("System details updated successfully:", {
+          location: selectedLocation.id,
+          spot: selectedSpots.id,
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error updating system details:", error);
+      return false;
+    }
+  };
+
+  // Function to validate step data before proceeding
+  const validateStep = (): boolean => {
+    if (!selectedLocation) {
+      return false;
+    }
+
+    // If location is selected but no spots are available, that's still valid
+    // If spots are available, at least one should be selected
+    if (filteredInstallSpots.length > 0 && !selectedSpots) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // Function to get step data
+  const getStepData = async () => {
+    const stepData = {
+      selectedLocation,
+      selectedSpots,
+      customRequirements: customRequirements.trim(),
+    };
+    // Save to store
+    setSystemDetailsData(stepData);
+
+    // Update system details and check if successful
+    const systemDetailsUpdated = await handleUpdateSystemDetails();
+
+    // Return both data and success status
+    return { data: stepData, success: systemDetailsUpdated };
+  };
+
+  // Expose validation and data functions to parent component
+  useImperativeHandle(ref, () => ({
+    validate: validateStep,
+    getData: getStepData,
+  }));
+
   return (
     <div className="max-w-2xl mx-auto">
       <Header title={title} subTitle={subTitle} />
@@ -50,7 +131,7 @@ const SystemDetailsStep = ({
                 Choose Installation Location
               </h3>
               <div className="space-y-3">
-                {installLocations.map((location) => (
+                {installLocations?.map((location) => (
                   <SelectableInput
                     key={location.id}
                     id={location.id}
@@ -71,7 +152,7 @@ const SystemDetailsStep = ({
                 </h3>
                 <div className="space-y-3">
                   {filteredInstallSpots.length ? (
-                    filteredInstallSpots.map((spot) => (
+                    filteredInstallSpots?.map((spot) => (
                       <SelectableInput
                         key={spot.id}
                         id={spot.id}
@@ -120,6 +201,8 @@ const SystemDetailsStep = ({
       </div>
     </div>
   );
-};
+});
+
+SystemDetailsStep.displayName = "SystemDetailsStep";
 
 export default SystemDetailsStep;

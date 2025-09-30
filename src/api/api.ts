@@ -16,11 +16,21 @@ export const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Add auth token if available
     const token = localStorage.getItem("token");
-    if (token) {
+    const accountId = localStorage.getItem("accountId");
+    const guestToken = localStorage.getItem("guestToken");
+
+    if (token && accountId) {
+      // Authenticated user - use Bearer token + Account ID
       config.headers.Authorization = `Bearer ${token}`;
+      config.headers["X-Account-Id"] = accountId;
+    } else if (guestToken) {
+      // Guest user - use Guest Token
+      config.headers["X-Guest-Token"] = guestToken;
     }
+
+    // Always add Accept header
+    config.headers.Accept = "application/json";
 
     console.log("API Request:", config.method?.toUpperCase(), config.url);
     return config;
@@ -44,6 +54,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("accountId");
+      localStorage.removeItem("guestToken");
       window.location.href = "/login";
     }
 
@@ -78,6 +90,23 @@ export const getErrorMessage = (error: any): string => {
     );
   }
   return error.message || "An error occurred";
+};
+
+// Helper function to set guest token
+export const setGuestToken = (token: string) => {
+  localStorage.setItem("guestToken", token);
+};
+
+// Helper function to clear guest token
+export const clearGuestToken = () => {
+  localStorage.removeItem("guestToken");
+};
+
+// Helper function to check if user is authenticated
+export const isAuthenticated = (): boolean => {
+  const token = localStorage.getItem("token");
+  const accountId = localStorage.getItem("accountId");
+  return !!(token && accountId);
 };
 
 export default api;
