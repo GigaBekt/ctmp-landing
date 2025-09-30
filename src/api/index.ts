@@ -26,3 +26,6 @@ export type {
 export { hvacServiceApi } from "./services/hvac-service.api";
 export { serviceApi } from "./services/service.api";
 export { manufacturersApi } from "./services/Manufacturers";
+
+// Export projects
+export { projectsApi } from "./projects";

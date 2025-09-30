@@ -1,30 +1,3 @@
-// const axios = require('axios');
-// const FormData = require('form-data');
-// const fs = require('fs');
-// let data = new FormData();
-// data.append('image', fs.createReadStream('/Users/otarmames/Desktop/Screenshot 2025-09-12 at 15.11.34.png'));
-// data.append('description', 'test photo');
-
-// let config = {
-//   method: 'post',
-//   maxBodyLength: Infinity,
-//   url: 'https://api.ctmpus.dev/projects/019973aa-ed0d-7135-a252-31379272897a/media',
-//   headers: {
-//     'Accept': 'application/json',
-//     'X-Account-Id': '{{accountId}}',
-//     ...data.getHeaders()
-//   },
-//   data : data
-// };
-
-// axios.request(config)
-// .then((response) => {
-//   console.log(JSON.stringify(response.data));
-// })
-// .catch((error) => {
-//   console.log(error);
-// });
-
 import axios from "axios";
 
 export const mediaUpload = async (projectId: string, formData: FormData) => {

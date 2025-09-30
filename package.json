@@ -15,6 +15,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.9",
     "@types/node": "^24.5.2",
     "@vis.gl/react-google-maps": "^1.5.5",
     "axios": "^1.12.2",
