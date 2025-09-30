@@ -42,6 +42,7 @@ export const useAuthStore = create<AuthState>()(
         // Also store in localStorage for persistence
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("accountId", user.accounts[0].id);
       },
 
       // Clear all auth data

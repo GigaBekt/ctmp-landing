@@ -25,3 +25,4 @@ export type {
 // Export services
 export { hvacServiceApi } from "./services/hvac-service.api";
 export { serviceApi } from "./services/service.api";
+export { manufacturersApi } from "./services/Manufacturers";

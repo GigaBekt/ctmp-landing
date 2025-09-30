@@ -1,26 +1,95 @@
-import { useState } from "react";
+import { useState, forwardRef, useImperativeHandle, useEffect } from "react";
 
-import { type IWizardStepsProps } from "../Wizard-steps-interface";
+import {
+  type IWizardStepsProps,
+  type IWizardStepRef,
+} from "../Wizard-steps-interface";
 import { Header, SelectableInput } from "../../components";
+import { useWizardStore } from "@/stores";
+import { updateHvacDetails } from "@/api/create-project/hvac/hvac.update";
 import type { UnitVolume } from "@/api/services/interface/hvac-interfaces";
 
-const SquareFeetStep = ({
-  title,
-  subTitle,
-  unitVolumes,
-}: IWizardStepsProps & { unitVolumes: UnitVolume[] }) => {
+const SquareFeetStep = forwardRef<
+  IWizardStepRef,
+  IWizardStepsProps & { unitVolumes: UnitVolume[] }
+>(({ title, subTitle, unitVolumes }, ref) => {
   const [selectedSize, setSelectedSize] = useState<UnitVolume | null>(null);
   const [customSize, setCustomSize] = useState("");
+
+  // Wizard store
+  const { data, setSquareFeetData } = useWizardStore();
+
+  // Load existing data from store
+  useEffect(() => {
+    if (data.squareFeet) {
+      setSelectedSize(data.squareFeet.selectedUnitVolume);
+    }
+  }, [data.squareFeet]);
+
   const handleSizeSelect = (size: UnitVolume) => {
     setSelectedSize(() => size);
   };
+
+  // Function to update square feet
+  const handleUpdateSquareFeet = async (): Promise<boolean> => {
+    try {
+      if (data.projectId && selectedSize) {
+        await updateHvacDetails(data.projectId, {
+          hvac_unit_volume_id: selectedSize.id,
+          custom_unit_volume:
+            selectedSize.id === "custom" ? customSize.trim() : undefined,
+        });
+        console.log("Square feet updated successfully:", selectedSize.id);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error updating square feet:", error);
+      return false;
+    }
+  };
+
+  // Function to validate step data before proceeding
+  const validateStep = (): boolean => {
+    if (!selectedSize) {
+      return false;
+    }
+
+    // If custom is selected, check if customSize is provided
+    if (selectedSize.id === "custom" && !customSize.trim()) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // Function to get step data
+  const getStepData = async () => {
+    const stepData = {
+      selectedUnitVolume: selectedSize,
+    };
+    // Save to store
+    setSquareFeetData(stepData);
+
+    // Update square feet and check if successful
+    const squareFeetUpdated = await handleUpdateSquareFeet();
+
+    // Return both data and success status
+    return { data: stepData, success: squareFeetUpdated };
+  };
+
+  // Expose validation and data functions to parent component
+  useImperativeHandle(ref, () => ({
+    validate: validateStep,
+    getData: getStepData,
+  }));
 
   return (
     <div className="max-w-2xl mx-auto">
       <Header title={title} subTitle={subTitle} />
 
       <div className="space-y-3">
-        {unitVolumes.map((size) => (
+        {unitVolumes?.map((size) => (
           <SelectableInput
             key={size.id}
             id={size.id}
@@ -77,6 +146,8 @@ const SquareFeetStep = ({
       )}
     </div>
   );
-};
+});
+
+SquareFeetStep.displayName = "SquareFeetStep";
 
 export default SquareFeetStep;

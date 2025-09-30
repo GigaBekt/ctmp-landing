@@ -2,14 +2,29 @@ import { CheckCircle, Info, TrendUp } from "phosphor-react";
 import { type IWizardStepsProps } from "../Wizard-steps-interface";
 import { Header } from "../../components";
 import { formatPrice } from "./estimate-helper";
+import { useWizardStore } from "@/stores";
+import { getEstimatePrice } from "@/api/create-project/hvac/hvac.update";
+import { useEffect, useState } from "react";
+import type { Price } from "@/api/create-project/hvac/interface/hvac-update-interface";
 
 const EstimatePriceStep = ({ title, subTitle }: IWizardStepsProps) => {
+  const { data } = useWizardStore();
+  const [priceEstimate, setPriceEstimate] = useState<Price | null>({
+    price: 0,
+  });
+
+  useEffect(() => {
+    if (data.projectId) {
+      getEstimatePrice(data.projectId).then((res) => {
+        console.log(res, "res");
+        setPriceEstimate({ price: res.data.price });
+      });
+    }
+  }, [data.projectId]);
+
   // Mock price calculation
-  const priceEstimate = {
-    low: 3800,
-    high: 5200,
-    average: 4500,
-  };
+  console.log(priceEstimate, "priceEstimate");
+  console.log(data, "this is data");
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
@@ -24,8 +39,7 @@ const EstimatePriceStep = ({ title, subTitle }: IWizardStepsProps) => {
               <span>Up to 30% Lower Than Competitors</span>
             </div>
             <h3 className="text-4xl font-bold text-gray-900 mb-2">
-              {formatPrice(priceEstimate.low)} -{" "}
-              {formatPrice(priceEstimate.high)}
+              {formatPrice(priceEstimate?.price || 0)}
             </h3>
             <p className="text-lg text-gray-600 mb-2">Estimated Project Cost</p>
             <p className="text-sm text-gray-500">
@@ -43,15 +57,19 @@ const EstimatePriceStep = ({ title, subTitle }: IWizardStepsProps) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-700">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-[#2c74b3]" />
-              <span>Home size: 2,000 sq ft</span>
+              <span>
+                Home size: {data.squareFeet?.selectedUnitVolume?.text}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-[#2c74b3]" />
-              <span>System: Central A/C</span>
+              <span>System: {data.heatSource?.selectedHeatSource?.name}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-[#2c74b3]" />
-              <span>Installation: Standard complexity</span>
+              <span>
+                Installation: {data.systemDetails?.selectedLocation?.name}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-[#2c74b3]" />

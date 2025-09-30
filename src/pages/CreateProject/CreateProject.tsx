@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useWizardStore } from "@/stores";
 import {
   MapPin,
   House,
@@ -15,6 +16,7 @@ import {
   Ruler,
   CurrencyDollar,
   Camera,
+  Factory,
 } from "phosphor-react";
 import { Button } from "@/components";
 import {
@@ -31,16 +33,11 @@ import {
   StageOptionsStep,
   SeerOptionsStep,
   UploadPhotosStep,
+  ManufacturerStep,
 } from "./wizard-steps";
+import type { IWizardStepRef } from "./wizard-steps/Wizard-steps-interface";
 import { serviceApi, hvacServiceApi } from "@/api";
-import type { HomeType, Service } from "@/api/services/interface";
-import type {
-  HeatSource,
-  InstallLocation,
-  InstallSpot,
-  SeerOption,
-  UnitVolume,
-} from "@/api/services/interface/hvac-interfaces";
+import { manufacturersApi } from "@/api/services/Manufacturers";
 
 // Wizard steps with components
 const wizardSteps = [
@@ -120,13 +117,13 @@ const wizardSteps = [
     component: StageOptionsStep,
   },
 
-  // {
-  //   id: "manufacturer",
-  //   icon: Manufacturer,
-  //   title: "Manufacturer",
-  //   subtitle: "Choose your preferred manufacturer",
-  //   component: ManufacturerStep,
-  // },
+  {
+    id: "manufacturer",
+    icon: Factory,
+    title: "Manufacturer",
+    subtitle: "Choose your preferred manufacturer",
+    component: ManufacturerStep,
+  },
   {
     id: "upload-photos",
     icon: Camera,
@@ -147,22 +144,39 @@ const wizardSteps = [
 
 const CreateProject = () => {
   const navigate = useNavigate();
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [showHelp] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const currentStepRef = useRef<IWizardStepRef>(null);
 
-  // API Data State
-  const [services, setServices] = useState<Service[]>([]);
-  const [heatSources, setHeatSources] = useState<HeatSource[]>([]);
-  const [unitVolumes, setUnitVolumes] = useState<UnitVolume[]>([]);
-  const [installSpots, setInstallSpots] = useState<InstallSpot[]>([]);
-  const [installLocations, setInstallLocations] = useState<InstallLocation[]>(
-    []
-  );
-  const [stageOptions, setStageOptions] = useState<SeerOption[]>([]);
-  const [seerOptions, setSeerOptions] = useState<SeerOption[]>([]);
-  const [homeTypes, setHomeTypes] = useState<HomeType[]>([]);
-  const [isLoadingData, setIsLoadingData] = useState(true);
+  // Wizard store
+  const {
+    currentStepIndex,
+    services,
+    heatSources,
+    unitVolumes,
+    installSpots,
+    installLocations,
+    stageOptions,
+    seerOptions,
+    homeTypes,
+    manufacturers,
+    isLoadingData,
+    isSubmitting,
+    nextStep,
+    previousStep,
+    setServices,
+    setHeatSources,
+    setUnitVolumes,
+    setInstallSpots,
+    setInstallLocations,
+    setStageOptions,
+    setSeerOptions,
+    setHomeTypes,
+    setManufacturers,
+    setLoadingData,
+    setSubmitting,
+    clearWizardData,
+  } = useWizardStore();
 
   const currentStep = wizardSteps[currentStepIndex];
 
@@ -170,7 +184,7 @@ const CreateProject = () => {
   useEffect(() => {
     const fetchAllData = async () => {
       try {
-        setIsLoadingData(true);
+        setLoadingData(true);
 
         // Fetch all API data in parallel
         const [
@@ -182,6 +196,7 @@ const CreateProject = () => {
           stageOptionsResponse,
           seerOptionsResponse,
           homeTypesResponse,
+          manufacturersResponse,
         ] = await Promise.all([
           serviceApi.getServices(),
           hvacServiceApi.heatSources(),
@@ -191,6 +206,7 @@ const CreateProject = () => {
           hvacServiceApi.stageOptions(),
           hvacServiceApi.seerOptions(),
           serviceApi.getHomeTypes(),
+          manufacturersApi.getManufacturers(),
         ]);
 
         setServices(servicesResponse.data);
@@ -201,31 +217,88 @@ const CreateProject = () => {
         setStageOptions(stageOptionsResponse.data);
         setSeerOptions(seerOptionsResponse.data);
         setHomeTypes(homeTypesResponse.data);
+        setManufacturers(manufacturersResponse.data);
       } catch (error) {
         console.error("Error fetching wizard data:", error);
       } finally {
-        setIsLoadingData(false);
+        setLoadingData(false);
       }
     };
 
     fetchAllData();
-  }, []);
+  }, [
+    setLoadingData,
+    setServices,
+    setHeatSources,
+    setUnitVolumes,
+    setInstallSpots,
+    setInstallLocations,
+    setStageOptions,
+    setSeerOptions,
+    setHomeTypes,
+    setManufacturers,
+  ]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    // Validate current step before proceeding
+    if (currentStepRef.current) {
+      const isValid = await currentStepRef.current.validate();
+      if (!isValid) {
+        return; // Don't proceed if validation fails
+      }
+
+      // Get step data for saving/processing
+      const stepResult = await currentStepRef.current.getData();
+      console.log(`Step ${currentStep.id} result:`, stepResult);
+
+      // Check if step was successful (for steps that have async operations)
+      if (
+        stepResult &&
+        typeof stepResult === "object" &&
+        "success" in stepResult
+      ) {
+        if (!stepResult.success) {
+          console.log(
+            `Step ${currentStep.id} failed, not proceeding to next step`
+          );
+          return; // Don't proceed if step failed
+        }
+        console.log(`Step ${currentStep.id} data:`, stepResult.data);
+      } else {
+        console.log(`Step ${currentStep.id} data:`, stepResult);
+      }
+    }
+
     if (currentStepIndex < wizardSteps.length - 1) {
-      setCurrentStepIndex((prev) => prev + 1);
+      nextStep();
     }
   };
 
   const handleBack = () => {
     if (currentStepIndex > 0) {
-      setCurrentStepIndex((prev) => prev - 1);
+      previousStep();
     }
   };
 
-  const handleSubmit = () => {
-    alert("Request submitted successfully!");
-    navigate("/dashboard");
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+
+      // Get all wizard data
+      const wizardData = useWizardStore.getState().getWizardSummary();
+      console.log("Submitting wizard data:", wizardData);
+
+      // Here you would typically send the data to your API
+      // await createProject(wizardData);
+
+      clearWizardData(); // Clear wizard data after successful submission
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error submitting project:", error);
+      alert("Error submitting project. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const renderCurrentStep = () => {
@@ -247,6 +320,7 @@ const CreateProject = () => {
       title: currentStep.title,
       subTitle: currentStep.subtitle,
       icon: currentStep.icon,
+      ref: currentStepRef,
       ...(currentStep.id === "service" && { services }),
       ...(currentStep.id === "heat-source" && { heatSources }),
       ...(currentStep.id === "system-details" && {
@@ -257,6 +331,7 @@ const CreateProject = () => {
       ...(currentStep.id === "stage-options" && { stageOptions }),
       ...(currentStep.id === "seer-options" && { seerOptions }),
       ...(currentStep.id === "home-details" && { homeTypes }),
+      ...(currentStep.id === "manufacturer" && { manufacturers }),
     };
 
     // @ts-expect-error - stepProps is typed correctly
@@ -342,9 +417,20 @@ const CreateProject = () => {
                     onClick={handleSubmit}
                     className="bg-green-600 hover:bg-green-700"
                     leftIcon={<Check size={16} />}
+                    disabled={isSubmitting}
                   >
-                    <span className="hidden sm:inline">Submit Request</span>
-                    <span className="sm:hidden">Submit</span>
+                    {isSubmitting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        <span className="hidden sm:inline">Submitting...</span>
+                        <span className="sm:hidden">Submitting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="hidden sm:inline">Submit Request</span>
+                        <span className="sm:hidden">Submit</span>
+                      </>
+                    )}
                   </Button>
                 )}
               </div>
@@ -394,6 +480,8 @@ const getStepHelpText = (stepId: string): string => {
       "Provide your home type and address so contractors can prepare accurate quotes for your property.",
     address:
       "Enter your property address so contractors can prepare accurate quotes and plan their visit.",
+    manufacturer:
+      "Choose your preferred manufacturer for the HVAC system. This helps us match you with contractors who work with your preferred brand.",
     timeline:
       "Let us know when you need the work completed. This helps us match you with available professionals.",
   };
