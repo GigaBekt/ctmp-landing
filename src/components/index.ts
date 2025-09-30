@@ -7,3 +7,6 @@ export * from "./core";
 
 // Common Business Components
 export * from "./common";
+
+// Shared Components
+export * from "./shared";

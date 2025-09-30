@@ -22,7 +22,7 @@ const Sidebar = () => {
   const menuItems = useMemo(
     () => [
       { icon: House, label: "Home", path: "/dashboard" },
-      { icon: Briefcase, label: "My Projects", path: "/projects" },
+      { icon: Briefcase, label: "My Projects", path: "/dashboard/projects" },
       {
         icon: FolderPlus,
         label: "Create Project",
@@ -80,6 +80,7 @@ const Sidebar = () => {
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }
                   `}
+                  end={item.path === "/dashboard"}
                 >
                   {({ isActive }) => (
                     <>

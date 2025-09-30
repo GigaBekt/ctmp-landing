@@ -78,11 +78,7 @@ const router = createBrowserRouter([
   // Customer Protected Routes (with Customer Sidebar)
   {
     path: "/dashboard",
-    element: (
-      <ProtectedRoute allowedRoles={["customer"]}>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
+    element: <DashboardLayout />,
     children: [
       {
         index: true,
