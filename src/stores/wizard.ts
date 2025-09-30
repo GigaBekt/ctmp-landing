@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { Service } from "@/api/services/interface";
+import type { Service, Manufacturer } from "@/api/services/interface";
 import type {
   HeatSource,
   InstallLocation,
@@ -70,6 +70,11 @@ export interface TimelineStepData {
   preferredDate?: string;
 }
 
+export interface ManufacturerStepData {
+  selectedManufacturer: Manufacturer | null;
+  otherText: string;
+}
+
 // Complete wizard data interface
 export interface WizardData {
   zipCode: ZipCodeStepData | null;
@@ -84,6 +89,7 @@ export interface WizardData {
   stageOptions: StageOptionsStepData | null;
   uploadPhotos: UploadPhotosStepData | null;
   timeline: TimelineStepData | null;
+  manufacturer: ManufacturerStepData | null;
   // Project data
   projectId: string | null;
   guestToken: string | null;
@@ -106,6 +112,7 @@ interface WizardState {
   stageOptions: SeerOption[];
   seerOptions: SeerOption[];
   homeTypes: HomeType[];
+  manufacturers: Manufacturer[];
 
   // Loading states
   isLoadingData: boolean;
@@ -129,6 +136,7 @@ interface WizardState {
   setStageOptionsData: (data: StageOptionsStepData) => void;
   setUploadPhotosData: (data: UploadPhotosStepData) => void;
   setTimelineData: (data: TimelineStepData) => void;
+  setManufacturerData: (data: ManufacturerStepData) => void;
 
   // Project data actions
   setProjectId: (projectId: string) => void;
@@ -143,6 +151,7 @@ interface WizardState {
   setStageOptions: (stageOptions: SeerOption[]) => void;
   setSeerOptions: (seerOptions: SeerOption[]) => void;
   setHomeTypes: (homeTypes: HomeType[]) => void;
+  setManufacturers: (manufacturers: Manufacturer[]) => void;
 
   // Loading actions
   setLoadingData: (loading: boolean) => void;
@@ -169,6 +178,7 @@ const initialWizardData: WizardData = {
   stageOptions: null,
   uploadPhotos: null,
   timeline: null,
+  manufacturer: null,
   projectId: null,
   guestToken: null,
 };
@@ -187,6 +197,7 @@ export const useWizardStore = create<WizardState>()(
       stageOptions: [],
       seerOptions: [],
       homeTypes: [],
+      manufacturers: [],
       isLoadingData: false,
       isSubmitting: false,
 
@@ -280,6 +291,12 @@ export const useWizardStore = create<WizardState>()(
         }));
       },
 
+      setManufacturerData: (data: ManufacturerStepData) => {
+        set((state) => ({
+          data: { ...state.data, manufacturer: data },
+        }));
+      },
+
       // Project data setters
       setProjectId: (projectId: string) => {
         set((state) => ({
@@ -326,6 +343,10 @@ export const useWizardStore = create<WizardState>()(
         set({ homeTypes });
       },
 
+      setManufacturers: (manufacturers: Manufacturer[]) => {
+        set({ manufacturers });
+      },
+
       // Loading setters
       setLoadingData: (loading: boolean) => {
         set({ isLoadingData: loading });
@@ -360,6 +381,7 @@ export const useWizardStore = create<WizardState>()(
         if (data.stageOptions) completedSteps.push("stage-options");
         if (data.uploadPhotos) completedSteps.push("upload-photos");
         if (data.timeline) completedSteps.push("timeline");
+        if (data.manufacturer) completedSteps.push("manufacturer");
 
         return completedSteps;
       },
@@ -392,6 +414,8 @@ export const useWizardStore = create<WizardState>()(
             return !!data.uploadPhotos;
           case "timeline":
             return !!data.timeline;
+          case "manufacturer":
+            return !!data.manufacturer;
           default:
             return false;
         }

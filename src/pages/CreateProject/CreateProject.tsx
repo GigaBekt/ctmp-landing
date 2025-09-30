@@ -16,6 +16,7 @@ import {
   Ruler,
   CurrencyDollar,
   Camera,
+  Factory,
 } from "phosphor-react";
 import { Button } from "@/components";
 import {
@@ -32,9 +33,11 @@ import {
   StageOptionsStep,
   SeerOptionsStep,
   UploadPhotosStep,
+  ManufacturerStep,
 } from "./wizard-steps";
 import type { IWizardStepRef } from "./wizard-steps/Wizard-steps-interface";
 import { serviceApi, hvacServiceApi } from "@/api";
+import { manufacturersApi } from "@/api/services/Manufacturers";
 
 // Wizard steps with components
 const wizardSteps = [
@@ -114,13 +117,13 @@ const wizardSteps = [
     component: StageOptionsStep,
   },
 
-  // {
-  //   id: "manufacturer",
-  //   icon: Manufacturer,
-  //   title: "Manufacturer",
-  //   subtitle: "Choose your preferred manufacturer",
-  //   component: ManufacturerStep,
-  // },
+  {
+    id: "manufacturer",
+    icon: Factory,
+    title: "Manufacturer",
+    subtitle: "Choose your preferred manufacturer",
+    component: ManufacturerStep,
+  },
   {
     id: "upload-photos",
     icon: Camera,
@@ -156,6 +159,7 @@ const CreateProject = () => {
     stageOptions,
     seerOptions,
     homeTypes,
+    manufacturers,
     isLoadingData,
     isSubmitting,
     nextStep,
@@ -168,6 +172,7 @@ const CreateProject = () => {
     setStageOptions,
     setSeerOptions,
     setHomeTypes,
+    setManufacturers,
     setLoadingData,
     setSubmitting,
     clearWizardData,
@@ -191,6 +196,7 @@ const CreateProject = () => {
           stageOptionsResponse,
           seerOptionsResponse,
           homeTypesResponse,
+          manufacturersResponse,
         ] = await Promise.all([
           serviceApi.getServices(),
           hvacServiceApi.heatSources(),
@@ -200,6 +206,7 @@ const CreateProject = () => {
           hvacServiceApi.stageOptions(),
           hvacServiceApi.seerOptions(),
           serviceApi.getHomeTypes(),
+          manufacturersApi.getManufacturers(),
         ]);
 
         setServices(servicesResponse.data);
@@ -210,6 +217,7 @@ const CreateProject = () => {
         setStageOptions(stageOptionsResponse.data);
         setSeerOptions(seerOptionsResponse.data);
         setHomeTypes(homeTypesResponse.data);
+        setManufacturers(manufacturersResponse.data);
       } catch (error) {
         console.error("Error fetching wizard data:", error);
       } finally {
@@ -228,6 +236,7 @@ const CreateProject = () => {
     setStageOptions,
     setSeerOptions,
     setHomeTypes,
+    setManufacturers,
   ]);
 
   const handleNext = async () => {
@@ -282,7 +291,6 @@ const CreateProject = () => {
       // Here you would typically send the data to your API
       // await createProject(wizardData);
 
-      alert("Request submitted successfully!");
       clearWizardData(); // Clear wizard data after successful submission
       navigate("/dashboard");
     } catch (error) {
@@ -323,6 +331,7 @@ const CreateProject = () => {
       ...(currentStep.id === "stage-options" && { stageOptions }),
       ...(currentStep.id === "seer-options" && { seerOptions }),
       ...(currentStep.id === "home-details" && { homeTypes }),
+      ...(currentStep.id === "manufacturer" && { manufacturers }),
     };
 
     // @ts-expect-error - stepProps is typed correctly
@@ -471,6 +480,8 @@ const getStepHelpText = (stepId: string): string => {
       "Provide your home type and address so contractors can prepare accurate quotes for your property.",
     address:
       "Enter your property address so contractors can prepare accurate quotes and plan their visit.",
+    manufacturer:
+      "Choose your preferred manufacturer for the HVAC system. This helps us match you with contractors who work with your preferred brand.",
     timeline:
       "Let us know when you need the work completed. This helps us match you with available professionals.",
   };

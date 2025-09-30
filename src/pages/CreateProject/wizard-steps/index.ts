@@ -11,3 +11,4 @@ export { default as HelpModal } from "./HelpModal";
 export { default as StageOptionsStep } from "./StageOptionsStep";
 export { default as SeerOptionsStep } from "./SeerOptionsStep";
 export { default as UploadPhotosStep } from "./UploadPhotosStep";
+export { default as ManufacturerStep } from "./ManufacturerStep";

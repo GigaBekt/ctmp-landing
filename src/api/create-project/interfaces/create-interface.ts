@@ -56,6 +56,7 @@ export interface UpdateProjectRequest {
   service_id?: string;
   address?: string;
   home_type_id?: string;
+  manufacturer_id?: string;
   schedule_pref?: string;
   notes?: string;
 }

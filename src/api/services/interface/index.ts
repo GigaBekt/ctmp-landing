@@ -42,3 +42,13 @@ export interface HomeType {
   created_at: string;
   updated_at: string;
 }
+
+export interface ManufacturersResponse {
+  message: string;
+  data: Manufacturer[];
+}
+export interface Manufacturer {
+  id: string;
+  name: string;
+  key: string;
+}
