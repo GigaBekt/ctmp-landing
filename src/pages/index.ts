@@ -6,3 +6,4 @@ export { default as CreateProject } from "./CreateProject";
 export { default as Projects } from "./Projects";
 export { default as ProjectDetail } from "./ProjectDetail";
 export { default as VendorOnboarding } from "./VendorOnboarding";
+export { default as Profile } from "./Profile";

@@ -17,6 +17,7 @@ import {
   Projects,
   ProjectDetail,
   VendorOnboarding,
+  Profile,
 } from "@/pages";
 import { useAuthStore } from "@/stores/auth";
 
@@ -92,6 +93,10 @@ const router = createBrowserRouter([
         path: "projects/:id",
         element: <ProjectDetail />,
       },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
     ],
   },
   // Vendor Protected Routes (with Vendor Sidebar)
@@ -130,6 +135,10 @@ const router = createBrowserRouter([
       {
         path: "projects/:id",
         element: <ProjectDetail />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },

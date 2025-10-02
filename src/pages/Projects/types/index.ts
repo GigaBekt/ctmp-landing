@@ -1,3 +1,8 @@
+import type {
+  ManufacturersResponse,
+  ServiceCategory,
+} from "@/api/services/interface";
+
 export interface Project {
   id: string;
   account_id: string;
@@ -9,7 +14,7 @@ export interface Project {
     created_at: string;
     updated_at: string;
   } | null;
-  service_category: any | null;
+  service_category: ServiceCategory | null;
   custom_service_category: string | null;
   zip: string;
   location: {
@@ -85,7 +90,7 @@ export interface Project {
   } | null;
   hvac_project_details: {
     id: string;
-    manufacturer: any | null;
+    manufacturer: ManufacturersResponse | null;
     custom_heat_source: string | null;
     heat_source: {
       id: string;

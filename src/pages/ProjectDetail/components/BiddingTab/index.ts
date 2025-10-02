@@ -1,0 +1,1 @@
+export { BiddingTab } from "./BiddingTab";

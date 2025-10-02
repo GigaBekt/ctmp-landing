@@ -26,10 +26,11 @@ import { projectsApi } from "@/api/projects";
 const STATUS_OPTIONS: StatusOption[] = [
   { value: "all", label: "All Projects" },
   { value: "draft", label: "Draft" },
-  { value: "pending_quote", label: "Pending Quote" },
+  { value: "pending_review", label: "Pending Review" },
+  { value: "active_bidding", label: "Active & Bidding" },
   { value: "in_progress", label: "In Progress" },
   { value: "completed", label: "Completed" },
-  { value: "cancelled", label: "Cancelled" },
+  { value: "canceled", label: "Canceled" },
 ];
 
 // Service type mapping to icons
@@ -47,17 +48,23 @@ const SERVICE_ICONS = {
 const StatusBadge = ({ status }: { status: string }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
+      case "pending_review":
+        return {
+          bg: "bg-amber-100",
+          text: "text-amber-800",
+          label: "Pending Review",
+        };
       case "draft":
         return {
           bg: "bg-gray-100",
           text: "text-gray-800",
           label: "Draft",
         };
-      case "pending_quote":
+      case "active_bidding":
         return {
-          bg: "bg-yellow-100",
-          text: "text-yellow-800",
-          label: "Pending Quote",
+          bg: "bg-blue-100",
+          text: "text-blue-800",
+          label: "Active & Bidding",
         };
       case "in_progress":
         return {
@@ -66,9 +73,13 @@ const StatusBadge = ({ status }: { status: string }) => {
           label: "In Progress",
         };
       case "completed":
-        return { bg: "bg-blue-100", text: "text-blue-800", label: "Completed" };
-      case "cancelled":
-        return { bg: "bg-red-100", text: "text-red-800", label: "Cancelled" };
+        return {
+          bg: "bg-purple-100",
+          text: "text-purple-800",
+          label: "Completed",
+        };
+      case "canceled":
+        return { bg: "bg-red-100", text: "text-red-800", label: "Canceled" };
       default:
         return { bg: "bg-gray-100", text: "text-gray-800", label: "Unknown" };
     }
@@ -254,7 +265,7 @@ const Projects = () => {
 
   // Handle project actions
   const handleViewProject = (id: string) => {
-    navigate(`/project/${id}`);
+    navigate(`/dashboard/projects/${id}`);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -299,30 +310,34 @@ const Projects = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="mb-6 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="flex flex-wrap gap-2">
-          {STATUS_OPTIONS.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setSelectedStatus(option.value)}
-              className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-                selectedStatus === option.value
-                  ? "bg-[#2c74b3] text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
+      <div className="mb-6 flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        {/* Status Filters - Scrollable on mobile, fixed on desktop */}
+        <div className="w-full lg:flex-1 overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0">
+          <div className="flex gap-2 min-w-max lg:min-w-0 lg:flex-wrap">
+            {STATUS_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setSelectedStatus(option.value)}
+                className={`px-3 py-2 text-sm rounded-lg transition-colors whitespace-nowrap flex-shrink-0 ${
+                  selectedStatus === option.value
+                    ? "bg-[#2c74b3] text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="relative w-full md:w-64">
+        {/* Search Bar */}
+        <div className="relative w-full lg:w-64 flex-shrink-0">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-gray-400" />
           </div>
           <input
             type="text"
-            placeholder="Search by address or service..."
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-[#2c74b3] focus:border-[#2c74b3]"
@@ -330,7 +345,8 @@ const Projects = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+      {/* Desktop Table View - hidden on mobile */}
+      <div className="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
         {/* Table Header */}
         <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200">
           <div className="col-span-3 flex items-center gap-1 text-sm font-medium text-gray-700">
@@ -446,6 +462,97 @@ const Projects = () => {
                   onView={handleViewProject}
                   onDelete={handleDeleteClick}
                 />
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Mobile Card View - visible on mobile only */}
+      <div className="lg:hidden space-y-4">
+        {filteredProjects.length === 0 ? (
+          <div className="bg-white rounded-lg border border-gray-200 px-6 py-12 text-center">
+            <p className="text-gray-500">
+              No projects found matching your criteria.
+            </p>
+            <button
+              onClick={() => {
+                setSelectedStatus("all");
+                setSearchQuery("");
+              }}
+              className="mt-4 text-[#2c74b3] hover:underline"
+            >
+              Clear filters
+            </button>
+          </div>
+        ) : (
+          filteredProjects.map((project) => (
+            <div
+              key={project.id}
+              className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden"
+            >
+              <div className="p-4 space-y-3">
+                {/* Header with Address and Actions */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                        <MapPin className="h-5 w-5 text-[#2c74b3]" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">
+                        {truncateAddress(project.address, 30)}
+                      </p>
+                      <p className="text-xs text-gray-500">{project.zip}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button
+                      onClick={() => handleViewProject(project.id)}
+                      className="p-2 text-gray-500 hover:text-[#2c74b3] hover:bg-blue-50 rounded-lg transition-colors"
+                    >
+                      <Eye className="h-5 w-5" />
+                    </button>
+                    <ActionDropdown
+                      project={project}
+                      onView={handleViewProject}
+                      onDelete={handleDeleteClick}
+                    />
+                  </div>
+                </div>
+
+                {/* Status Badge */}
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={project.status} />
+                </div>
+
+                {/* Info Grid */}
+                <div className="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">Service</p>
+                    <div className="flex items-center gap-2">
+                      <ServiceIcon service={project.service?.name || "hvac"} />
+                      <p className="text-sm font-medium text-gray-900 capitalize">
+                        {project.service?.name || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 mb-1">House Type</p>
+                    <p className="text-sm font-medium text-gray-900 capitalize">
+                      {project.home_type?.name ||
+                        project.custom_home_type ||
+                        "N/A"}
+                    </p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-500 mb-1">Created</p>
+                    <p className="text-sm text-gray-900">
+                      {formatDate(project.created_at)}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           ))
