@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface TimelineItemProps {
   title: string;
@@ -23,7 +23,7 @@ const TimelineItem = ({
   isFuture = false,
   isLast = false,
   children,
-  className = ""
+  className = "",
 }: TimelineItemProps) => {
   const getIconColor = () => {
     if (isActive) return "text-blue-600";
@@ -40,24 +40,20 @@ const TimelineItem = ({
   return (
     <div className={`relative ${className}`}>
       <div className="flex items-start gap-4">
-        <div className={`flex-shrink-0 w-12 h-12 rounded-full ${getBackgroundColor()} flex items-center justify-center ${getIconColor()}`}>
+        <div
+          className={`flex-shrink-0 w-12 h-12 rounded-full ${getBackgroundColor()} flex items-center justify-center ${getIconColor()}`}
+        >
           {icon}
         </div>
         <div className="flex-1 min-w-0 pb-6">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-900">{title}</h4>
-            {date && (
-              <p className="text-xs text-gray-500">{date}</p>
-            )}
+            {date && <p className="text-xs text-gray-500">{date}</p>}
           </div>
           {description && (
             <p className="mt-1 text-sm text-gray-600">{description}</p>
           )}
-          {children && (
-            <div className="mt-3">
-              {children}
-            </div>
-          )}
+          {children && <div className="mt-3">{children}</div>}
         </div>
       </div>
       {!isLast && (
