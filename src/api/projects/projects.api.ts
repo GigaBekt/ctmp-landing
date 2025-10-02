@@ -1,5 +1,5 @@
 import { api } from "@/api";
-import type { ProjectResponse } from "@/pages/Projects/types";
+import type { ProjectResponse, Project } from "@/pages/Projects/types";
 
 export const projectsApi = {
   getProjects: async (): Promise<ProjectResponse> => {
@@ -7,8 +7,8 @@ export const projectsApi = {
     return response.data;
   },
 
-  getProjectById: async (id: string): Promise<ProjectResponse> => {
-    const response = await api.get<ProjectResponse>(`/projects/${id}`);
+  getProjectById: async (id: string): Promise<Project> => {
+    const response = await api.get<Project>(`/projects/${id}`);
     return response.data;
   },
 
@@ -16,8 +16,8 @@ export const projectsApi = {
     await api.delete(`/projects/${id}`);
   },
 
-  updateProject: async (id: string, data: any): Promise<ProjectResponse> => {
-    const response = await api.patch<ProjectResponse>(`/projects/${id}`, data);
-    return response.data;
-  },
+  // updateProject: async (id: string, data: any): Promise<ProjectResponse> => {
+  //   const response = await api.patch<ProjectResponse>(`/projects/${id}`, data);
+  //   return response.data;
+  // },
 };

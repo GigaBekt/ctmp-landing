@@ -28,7 +28,7 @@ const Sidebar = () => {
         label: "Create Project",
         path: "/create-project",
       },
-      { icon: User, label: "My Profile", path: "/profile" },
+      { icon: User, label: "My Profile", path: "/dashboard/profile" },
       {
         icon: Bell,
         label: "Notifications",

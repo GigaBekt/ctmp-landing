@@ -22,17 +22,17 @@ const VendorSidebar = () => {
   // Vendor menu items
   const menuItems = useMemo(
     () => [
-      { icon: House, label: "Home", path: "/dashboard" },
-      { icon: FileText, label: "Projects", path: "/projects" },
-      { icon: FileText, label: "My Projects", path: "/my-projects" },
-      { icon: Users, label: "Team", path: "/team" },
+      { icon: House, label: "Home", path: "/vendor/dashboard" },
+      { icon: FileText, label: "Projects", path: "/vendor/projects" },
+      { icon: FileText, label: "My Projects", path: "/vendor/my-projects" },
+      { icon: Users, label: "Team", path: "/vendor/team" },
       {
         icon: Bell,
         label: "Notifications",
-        path: "/notifications",
+        path: "/vendor/notifications",
         count: unreadCount,
       },
-      { icon: User, label: "My Profile", path: "/profile" },
+      { icon: User, label: "My Profile", path: "/vendor/profile" },
     ],
     [unreadCount]
   );
@@ -77,6 +77,7 @@ const VendorSidebar = () => {
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }
                 `}
+                end={item.path === "/vendor/dashboard"}
               >
                 {({ isActive }) => (
                   <>
