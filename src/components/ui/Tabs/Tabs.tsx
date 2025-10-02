@@ -1,4 +1,4 @@
-import { useState, ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 interface Tab {
   id: string;
@@ -41,7 +41,7 @@ const Tabs = ({ tabs, className = "" }: TabsProps) => {
 
       {/* Tab Content */}
       <div className="mt-6">
-        {tabs.find(tab => tab.id === activeTab)?.content}
+        {tabs.find((tab) => tab.id === activeTab)?.content}
       </div>
     </div>
   );

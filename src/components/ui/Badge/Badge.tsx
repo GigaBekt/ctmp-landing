@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { type ReactNode } from "react";
 
 interface BadgeProps {
   children: ReactNode;
@@ -8,19 +8,19 @@ interface BadgeProps {
   className?: string;
 }
 
-const Badge = ({ 
-  children, 
-  variant = "default", 
-  size = "md", 
+const Badge = ({
+  children,
+  variant = "default",
+  size = "md",
   bold = false,
-  className = "" 
+  className = "",
 }: BadgeProps) => {
   const baseClasses = "inline-flex items-center rounded-full font-medium";
-  
+
   const sizeClasses = {
     sm: "px-2 py-0.5 text-xs",
     md: "px-2.5 py-0.5 text-xs",
-    lg: "px-3 py-1 text-sm"
+    lg: "px-3 py-1 text-sm",
   };
 
   const variantClasses = {
@@ -28,13 +28,15 @@ const Badge = ({
     info: "bg-blue-100 text-blue-800",
     success: "bg-green-100 text-green-800",
     warning: "bg-yellow-100 text-yellow-800",
-    error: "bg-red-100 text-red-800"
+    error: "bg-red-100 text-red-800",
   };
 
   const boldClasses = bold ? "font-bold" : "";
 
   return (
-    <span className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${boldClasses} ${className}`}>
+    <span
+      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${boldClasses} ${className}`}
+    >
       {children}
     </span>
   );

@@ -12,4 +12,4 @@ export * from "./common";
 export * from "./shared";
 
 // UI Components
-export * from "./ui";
+export { Card, InfoItem, TimelineItem, Badge, Tabs } from "./ui";
