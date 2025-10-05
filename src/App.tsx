@@ -18,6 +18,7 @@ import {
   ProjectDetail,
   VendorOnboarding,
   Profile,
+  Notifications,
 } from "@/pages";
 import { useAuthStore } from "@/stores/auth";
 
@@ -97,6 +98,10 @@ const router = createBrowserRouter([
         path: "profile",
         element: <Profile />,
       },
+      {
+        path: "notifications",
+        element: <Notifications />,
+      },
     ],
   },
   // Vendor Protected Routes (with Vendor Sidebar)
@@ -139,6 +144,10 @@ const router = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: "notifications",
+        element: <Notifications />,
       },
     ],
   },
