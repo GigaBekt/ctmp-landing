@@ -17,12 +17,15 @@ import {
   ArrowRight,
 } from "phosphor-react";
 import { type DashboardStats, type Project, type Bid } from "./interfaces";
+import { useAuthStore } from "@/stores/auth";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [bids, setBids] = useState<Bid[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuthStore();
+  console.log(user, "this is user");
 
   // Mock data loading
   useEffect(() => {

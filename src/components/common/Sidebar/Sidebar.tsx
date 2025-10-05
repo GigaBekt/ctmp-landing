@@ -32,7 +32,7 @@ const Sidebar = () => {
       {
         icon: Bell,
         label: "Notifications",
-        path: "/notifications",
+        path: "/dashboard/notifications",
         count: unreadCount,
       },
     ],

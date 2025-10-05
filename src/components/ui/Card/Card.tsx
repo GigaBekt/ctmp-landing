@@ -6,6 +6,7 @@ interface CardProps {
   titleRight?: ReactNode;
   children: ReactNode;
   className?: string;
+  onClick?: () => void;
 }
 
 const Card = ({
@@ -14,6 +15,7 @@ const Card = ({
   titleRight,
   children,
   className = "",
+  onClick,
 }: CardProps) => {
   const titleSizeClasses = {
     sm: "text-sm font-semibold",
@@ -24,6 +26,7 @@ const Card = ({
   return (
     <div
       className={`bg-white rounded-lg border border-gray-200 p-4 ${className}`}
+      onClick={onClick}
     >
       {title && (
         <div className="flex items-center justify-between mb-4">

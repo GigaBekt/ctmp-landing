@@ -19,7 +19,6 @@ import {
 import { useClickOutside } from "@/hooks/useClickOutside";
 import type { Project, StatusOption } from "./types";
 import { ConfirmationModal } from "@/components/shared/Modal";
-// import { useUserStore } from "@/stores/useUserStore";
 import { projectsApi } from "@/api/projects";
 
 // Project status options
@@ -164,7 +163,6 @@ const ActionDropdown = ({
 };
 
 const Projects = () => {
-  // const { user } = useUserStore();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
