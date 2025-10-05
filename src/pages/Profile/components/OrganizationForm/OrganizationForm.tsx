@@ -30,7 +30,6 @@ const OrganizationForm = ({
     register: registerOrg,
     handleSubmit: handleSubmitOrg,
     formState: { errors: orgErrors },
-    reset: resetOrg,
   } = useForm<OrganizationData>({
     defaultValues: organization || {
       organizationName: "",
