@@ -20,6 +20,7 @@ import {
   Profile,
   Notifications,
 } from "@/pages";
+import VendorDashboard from "@/pages/Dashboard/VendorDashboard";
 import { useAuthStore } from "@/stores/auth";
 
 // Smart redirect component based on user type
@@ -119,7 +120,7 @@ const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <Dashboard />,
+        element: <VendorDashboard />,
       },
       {
         path: "onboarding",
