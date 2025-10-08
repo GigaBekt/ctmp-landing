@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { StatCard, EmptyState, ResourceItem, Button } from "@/components";
 import {
   Lightning,
-  ChartBar,
   Plus,
   Info,
   MapPin,
@@ -222,7 +221,7 @@ const VendorDashboard = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <StatCard
           icon={Lightning}
           title="Active Bids"
@@ -243,13 +242,6 @@ const VendorDashboard = () => {
           value={stats.completedProjects}
           iconBgColor="bg-purple-100"
           iconColor="text-purple-600"
-        />
-        <StatCard
-          icon={ChartBar}
-          title="Average Rating"
-          value={`${stats.averageRating}/5.0`}
-          iconBgColor="bg-yellow-100"
-          iconColor="text-yellow-600"
         />
       </div>
 
