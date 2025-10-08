@@ -14,12 +14,15 @@ export interface Location {
   id: string;
   name: string;
   type: string;
+  type_label?: string;
   parent_id: string | null;
   abbreviation: string | null;
+  full_name?: string;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
   parent?: Location;
+  children?: Location[];
 }
 
 export interface VendorLocationsResponse {
@@ -33,9 +36,7 @@ export interface AvailableLocationsResponse {
 }
 
 export interface CreateVendorLocationRequest {
-  location_id: string;
-  is_primary?: boolean;
-  service_radius?: number;
+  location_ids: string[];
 }
 
 export interface CreateVendorLocationResponse {

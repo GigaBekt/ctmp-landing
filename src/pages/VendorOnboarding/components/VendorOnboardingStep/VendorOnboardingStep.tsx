@@ -4,18 +4,21 @@ import { WarningCircle, Spinner } from "phosphor-react";
 import {
   uploadVendorDocument,
   deleteVendorDocument,
+  getDocumentTypes,
 } from "@/api/vendor/vendor-documents";
-import { createVendorLocation } from "@/api/vendor/vendor-locations";
+import {
+  createVendorLocation,
+  getAvailableLocations,
+} from "@/api/vendor/vendor-locations";
 import { validateFileForUpload } from "@/api/vendor/utils/vendor-documents.utils";
 import type {
   VendorDocumentType,
   VendorDocument,
   Location,
-  VendorLocation,
 } from "@/api/vendor/interfaces";
 import ProgressIndicator from "./ProgressIndicator";
 import DocumentUpload from "./DocumentUpload";
-import LocationSelection from "./LocationSelection";
+import HierarchicalLocationSelection from "./HierarchicalLocationSelection";
 import NavigationButtons from "./NavigationButtons";
 import PaymentMethod from "./PaymentMethod";
 
@@ -47,12 +50,6 @@ const VendorOnboardingStep = ({
 
   // Location state
   const [availableLocations, setAvailableLocations] = useState<Location[]>([]);
-  const [selectedLocations, setSelectedLocations] = useState<VendorLocation[]>(
-    []
-  );
-  const [selectedLocationIds, setSelectedLocationIds] = useState<Set<string>>(
-    new Set()
-  );
 
   // Payment state
   const [paymentMethodId, setPaymentMethodId] = useState<string | null>(null);
@@ -65,109 +62,13 @@ const VendorOnboardingStep = ({
   const loadInitialData = async () => {
     setIsLoading(true);
     try {
-      // Mock data for development - replace with actual API calls
-      const mockDocumentTypes = [
-        {
-          id: "1",
-          name: "Business License",
-          description: "Upload your business license or permit",
-          is_required: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "2",
-          name: "Insurance Certificate",
-          description: "Upload your liability insurance certificate",
-          is_required: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "3",
-          name: "Professional Certification",
-          description: "Upload any HVAC certifications or licenses",
-          is_required: false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        {
-          id: "4",
-          name: "Tax ID Document",
-          description: "Upload your tax identification document",
-          is_required: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-      ];
-
-      const mockLocations = [
-        {
-          id: "1",
-          name: "Atlanta",
-          type: "city",
-          parent_id: null,
-          abbreviation: "ATL",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-        },
-        {
-          id: "2",
-          name: "Marietta",
-          type: "city",
-          parent_id: null,
-          abbreviation: "MAR",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-        },
-        {
-          id: "3",
-          name: "Sandy Springs",
-          type: "city",
-          parent_id: null,
-          abbreviation: "SS",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-        },
-        {
-          id: "4",
-          name: "Roswell",
-          type: "city",
-          parent_id: null,
-          abbreviation: "ROS",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-        },
-        {
-          id: "5",
-          name: "Alpharetta",
-          type: "city",
-          parent_id: null,
-          abbreviation: "ALP",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-        },
-        {
-          id: "6",
-          name: "Johns Creek",
-          type: "city",
-          parent_id: null,
-          abbreviation: "JC",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          deleted_at: null,
-        },
-      ];
-
-      setDocumentTypes(mockDocumentTypes);
-      setAvailableLocations(mockLocations);
-      setSelectedLocations([]);
-      setSelectedLocationIds(new Set());
+      // API calls for document types and locations
+      const [documentTypes, locations] = await Promise.all([
+        getDocumentTypes(),
+        getAvailableLocations(),
+      ]);
+      setDocumentTypes(documentTypes.data);
+      setAvailableLocations(locations.data);
     } catch {
       setError("Failed to load data. Please try again.");
     } finally {
@@ -219,58 +120,23 @@ const VendorOnboardingStep = ({
     });
   };
 
-  const handleLocationToggle = async (locationId: string) => {
-    const isSelected = selectedLocationIds.has(locationId);
-
-    if (isSelected) {
-      // Remove location
-      const locationToRemove = selectedLocations.find(
-        (loc) => loc.location_id === locationId
-      );
-      if (locationToRemove) {
-        try {
-          await createVendorLocation(vendorOrganizationId, {
-            location_id: locationId,
-            is_primary: false,
-            service_radius: 25,
-          });
-          setSelectedLocationIds((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(locationId);
-            return newSet;
-          });
-          setSelectedLocations((prev) =>
-            prev.filter((loc) => loc.location_id !== locationId)
-          );
-        } catch {
-          setError("Failed to remove location. Please try again.");
-        }
-      }
-    } else {
-      // Add location
-      try {
-        const response = await createVendorLocation(vendorOrganizationId, {
-          location_id: locationId,
-          is_primary: selectedLocations.length === 0, // First location is primary
-          service_radius: 25,
-        });
-        setSelectedLocationIds((prev) => new Set(prev).add(locationId));
-        setSelectedLocations((prev) => [...prev, response.data]);
-      } catch {
-        setError("Failed to add location. Please try again.");
-      }
-    }
-  };
-
   const handlePaymentMethodAdded = (paymentId: string) => {
     setPaymentMethodId(paymentId);
   };
 
-  const handleNextStep = () => {
+  const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
+
+  const handleNextStep = async () => {
     if (currentStep === "documents") {
       setCurrentStep("locations");
     } else if (currentStep === "locations") {
-      setCurrentStep("payment");
+      const response = await createVendorLocation(vendorOrganizationId, {
+        location_ids: Array.from(selectedCities),
+      });
+      console.log(response, "response");
+      if (response) {
+        setCurrentStep("payment");
+      }
     } else {
       onComplete();
     }
@@ -289,9 +155,7 @@ const VendorOnboardingStep = ({
     .every((requiredType) =>
       uploadedDocuments.some((doc) => doc.document_type.id === requiredType.id)
     );
-
-  const isLocationsStepComplete = selectedLocations.length > 0;
-
+  const isLocationsStepComplete = selectedCities.size > 0;
   const isPaymentStepComplete = paymentMethodId !== null;
 
   if (isLoading) {
@@ -306,7 +170,7 @@ const VendorOnboardingStep = ({
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
+    <div className="max-w-3xl mx-auto p-6 min-h-lvh">
       <ProgressIndicator
         currentStep={currentStep}
         isDocumentsStepComplete={isDocumentsStepComplete}
@@ -340,11 +204,10 @@ const VendorOnboardingStep = ({
 
       {/* Locations Step */}
       {currentStep === "locations" && (
-        <LocationSelection
+        <HierarchicalLocationSelection
           availableLocations={availableLocations}
-          selectedLocations={selectedLocations}
-          selectedLocationIds={selectedLocationIds}
-          onLocationToggle={handleLocationToggle}
+          selectedCities={selectedCities}
+          setSelectedCities={setSelectedCities}
         />
       )}
 
