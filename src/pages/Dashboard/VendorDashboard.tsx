@@ -192,11 +192,11 @@ const VendorDashboard = () => {
       case "new_opportunity":
         return "text-blue-600 bg-blue-50";
       case "project_completed":
-        return "text-purple-600 bg-purple-50";
+        return "text-green-600 bg-green-50";
       case "bid_submitted":
-        return "text-yellow-600 bg-yellow-50";
+        return "text-blue-600 bg-blue-50";
       default:
-        return "text-gray-600 bg-gray-50";
+        return "text-blue-600 bg-blue-50";
     }
   };
 
@@ -240,8 +240,8 @@ const VendorDashboard = () => {
           icon={CheckCircle}
           title="Completed Projects"
           value={stats.completedProjects}
-          iconBgColor="bg-purple-100"
-          iconColor="text-purple-600"
+          iconBgColor="bg-green-100"
+          iconColor="text-green-600"
         />
       </div>
 
@@ -265,7 +265,7 @@ const VendorDashboard = () => {
                   variant="ghost"
                   size="sm"
                   rightIcon={<ArrowRight size={16} />}
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-primary-600 hover:text-primary-800"
                 >
                   View All
                 </Button>
@@ -329,8 +329,8 @@ const VendorDashboard = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100">
             <div className="p-6">
               <div className="flex items-center mb-4">
-                <div className="bg-purple-100 rounded-full p-2 mr-3">
-                  <Clock className="text-purple-600" size={20} />
+                <div className="bg-blue-100 rounded-full p-2 mr-3">
+                  <Clock className="text-blue-600" size={20} />
                 </div>
                 <h2 className="text-xl font-semibold text-gray-800">
                   Recent Activity
@@ -413,7 +413,7 @@ const VendorDashboard = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-800 flex items-center">
-                <Lightning className="w-5 h-5 mr-2 text-gray-600" />
+                <Lightning className="w-5 h-5 mr-2 text-blue-600" />
                 AI Tips
               </h2>
               <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
@@ -423,7 +423,7 @@ const VendorDashboard = () => {
             <div className="space-y-4">
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-start gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <p className="text-sm font-medium text-gray-900 mb-1">
                       Boost Your Success Rate
@@ -438,7 +438,7 @@ const VendorDashboard = () => {
 
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-start gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <p className="text-sm font-medium text-gray-900 mb-1">
                       Focus Your Efforts
@@ -453,7 +453,7 @@ const VendorDashboard = () => {
 
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-start gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <p className="text-sm font-medium text-gray-900 mb-1">
                       Improve Your Profile
@@ -467,7 +467,7 @@ const VendorDashboard = () => {
 
               <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="flex items-start gap-2">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <p className="text-sm font-medium text-gray-900 mb-1">
                       Pricing Strategy
