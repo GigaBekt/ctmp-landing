@@ -293,7 +293,7 @@ const CreateProject = () => {
       // await createProject(wizardData);
       await confirmProject(wizardData.projectId as string);
       clearWizardData(); // Clear wizard data after successful submission
-      navigate("/dashboard");
+      navigate(`/dashboard/projects/${wizardData.projectId}`);
     } catch (error) {
       console.error("Error submitting project:", error);
       alert("Error submitting project. Please try again.");
