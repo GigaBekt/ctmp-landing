@@ -30,35 +30,12 @@ export const uploadVendorDocument = async (
   formData.append("vendor_document_type_id", vendorDocumentTypeId);
 
   const response = await api.post(
-    `vendor-organizations/${vendorOrganizationId}/documents`,
+    `/vendor-organizations/${vendorOrganizationId}/documents`,
     formData,
     {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    }
-  );
-  return response.data;
-};
-
-export const deleteVendorDocument = async (
-  vendorOrganizationId: string,
-  documentId: string
-): Promise<{ message: string }> => {
-  const response = await api.delete(
-    `vendor-organizations/${vendorOrganizationId}/documents/${documentId}`
-  );
-  return response.data;
-};
-
-export const downloadVendorDocument = async (
-  vendorOrganizationId: string,
-  documentId: string
-): Promise<Blob> => {
-  const response = await api.get(
-    `vendor-organizations/${vendorOrganizationId}/documents/${documentId}/download`,
-    {
-      responseType: "blob",
     }
   );
   return response.data;

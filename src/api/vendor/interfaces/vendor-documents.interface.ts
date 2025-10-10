@@ -31,6 +31,7 @@ export interface VendorDocumentType {
   id: string;
   name: string;
   description: string;
+  is_required: boolean;
   created_at: string;
   updated_at: string;
 }

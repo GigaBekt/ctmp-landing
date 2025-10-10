@@ -20,6 +20,7 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import type { Project, StatusOption } from "./types";
 import { ConfirmationModal } from "@/components/shared/Modal";
 import { projectsApi } from "@/api/projects";
+import { useAuthStore } from "@/stores/auth";
 
 // Project status options
 const STATUS_OPTIONS: StatusOption[] = [
@@ -262,8 +263,14 @@ const Projects = () => {
   };
 
   // Handle project actions
+  const { getUserRole } = useAuthStore();
   const handleViewProject = (id: string) => {
-    navigate(`/dashboard/projects/${id}`);
+    const userRole = getUserRole();
+    if (userRole === "vendor") {
+      navigate(`/vendor/projects/${id}`);
+    } else {
+      navigate(`/dashboard/projects/${id}`);
+    }
   };
 
   const handleDeleteClick = (id: string) => {

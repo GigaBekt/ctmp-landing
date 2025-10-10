@@ -16,6 +16,7 @@ import {
   CreateProject,
   Projects,
   ProjectDetail,
+  VendorProjectDetail,
   VendorOnboarding,
   Profile,
   Notifications,
@@ -76,6 +77,10 @@ const router = createBrowserRouter([
         path: "create-project",
         element: <CreateProject />,
       },
+      {
+        path: "/vendor/onboarding",
+        element: <VendorOnboarding />,
+      },
     ],
   },
   // Customer Protected Routes (with Customer Sidebar)
@@ -122,10 +127,7 @@ const router = createBrowserRouter([
         path: "dashboard",
         element: <VendorDashboard />,
       },
-      {
-        path: "onboarding",
-        element: <VendorOnboarding />,
-      },
+
       {
         path: "projects",
         element: <Projects />,
@@ -140,7 +142,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:id",
-        element: <ProjectDetail />,
+        element: <VendorProjectDetail />,
       },
       {
         path: "profile",
