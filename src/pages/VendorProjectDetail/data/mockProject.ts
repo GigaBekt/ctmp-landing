@@ -21,6 +21,17 @@ export const mockProject: Project = {
     service_id: "service-001",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
+    parent_id: null,
+    service: {
+      id: "service-001",
+      key: "hvac",
+      name: "HVAC",
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z",
+    },
+    children: [],
+    children_count: 0,
+    projects_count: 0,
   },
   custom_service_category: null,
   zip: "30301",
@@ -97,14 +108,18 @@ export const mockProject: Project = {
     deleted_at: null,
   },
   hvac_project_details: {
-    id: "hvac-001",
+    id: "hvac-det-001",
     manufacturer: {
-      id: "mfr-001",
-      name: "Carrier",
-      logo_url: null,
-      website_url: "https://www.carrier.com",
-      created_at: "2024-01-01T00:00:00Z",
-      updated_at: "2024-01-01T00:00:00Z",
+      message: "success",
+      data: [
+        {
+          id: "mfr-001",
+          name: "Carrier",
+          key: "carrier",
+          created_at: "2024-01-01T00:00:00Z",
+          updated_at: "2024-01-01T00:00:00Z",
+        },
+      ],
     },
     custom_heat_source: null,
     heat_source: {
