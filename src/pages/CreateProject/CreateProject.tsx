@@ -291,13 +291,9 @@ const CreateProject = () => {
 
       // Here you would typically send the data to your API
       // await createProject(wizardData);
-      const confirmedProject = await confirmProject(
-        wizardData.projectId as string
-      );
-      if (confirmedProject.success) {
-        clearWizardData(); // Clear wizard data after successful submission
-        navigate("/dashboard");
-      }
+      await confirmProject(wizardData.projectId as string);
+      clearWizardData(); // Clear wizard data after successful submission
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error submitting project:", error);
       alert("Error submitting project. Please try again.");

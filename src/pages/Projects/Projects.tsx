@@ -21,6 +21,7 @@ import type { Project, StatusOption } from "./types";
 import { ConfirmationModal } from "@/components/shared/Modal";
 import { projectsApi } from "@/api/projects";
 import { useAuthStore } from "@/stores/auth";
+import { StatusBadge } from "../ProjectDetail/components";
 
 // Project status options
 const STATUS_OPTIONS: StatusOption[] = [
@@ -43,58 +44,6 @@ const SERVICE_ICONS = {
   painting: PaintBucket,
   manufacturer: Factory,
 } as Record<string, React.ComponentType<{ className?: string; size?: number }>>;
-
-// Status badge component
-const StatusBadge = ({ status }: { status: string }) => {
-  const getStatusConfig = (status: string) => {
-    switch (status) {
-      case "in_review":
-        return {
-          bg: "bg-amber-100",
-          text: "text-amber-800",
-          label: "In Review",
-        };
-      case "draft":
-        return {
-          bg: "bg-gray-100",
-          text: "text-gray-800",
-          label: "Draft",
-        };
-      case "active":
-        return {
-          bg: "bg-blue-100",
-          text: "text-blue-800",
-          label: "Active & Bidding",
-        };
-      case "in_progress":
-        return {
-          bg: "bg-green-100",
-          text: "text-green-800",
-          label: "In Progress",
-        };
-      case "completed":
-        return {
-          bg: "bg-purple-100",
-          text: "text-purple-800",
-          label: "Completed",
-        };
-      case "canceled":
-        return { bg: "bg-red-100", text: "text-red-800", label: "Canceled" };
-      default:
-        return { bg: "bg-gray-100", text: "text-gray-800", label: "Unknown" };
-    }
-  };
-
-  const { bg, text, label } = getStatusConfig(status);
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${bg} ${text}`}
-    >
-      {label}
-    </span>
-  );
-};
 
 // Service icon component
 const ServiceIcon = ({ service }: { service: string }) => {
