@@ -6,11 +6,11 @@ interface StatusBadgeProps {
 const StatusBadge = ({ status, size = "md" }: StatusBadgeProps) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "pending_review":
+      case "in_review":
         return {
           bg: "bg-amber-100",
           text: "text-amber-800",
-          label: "Pending Review",
+          label: "In Review",
         };
       case "draft":
         return {
@@ -71,7 +71,7 @@ const StatusBadge = ({ status, size = "md" }: StatusBadgeProps) => {
 // eslint-disable-next-line react-refresh/only-export-components
 export const getStatusDescription = (status: string): string => {
   switch (status) {
-    case "pending_review":
+    case "in_review":
       return "Project is awaiting review and approval";
     case "draft":
       return "Project is in draft stage and being prepared";

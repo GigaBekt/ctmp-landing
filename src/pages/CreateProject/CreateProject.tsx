@@ -38,6 +38,7 @@ import {
 import type { IWizardStepRef } from "./wizard-steps/Wizard-steps-interface";
 import { serviceApi, hvacServiceApi } from "@/api";
 import { manufacturersApi } from "@/api/services/Manufacturers";
+import { confirmProject } from "@/api/create-project/create.project";
 
 // Wizard steps with components
 const wizardSteps = [
@@ -290,9 +291,13 @@ const CreateProject = () => {
 
       // Here you would typically send the data to your API
       // await createProject(wizardData);
-
-      clearWizardData(); // Clear wizard data after successful submission
-      navigate("/dashboard");
+      const confirmedProject = await confirmProject(
+        wizardData.projectId as string
+      );
+      if (confirmedProject.success) {
+        clearWizardData(); // Clear wizard data after successful submission
+        navigate("/dashboard");
+      }
     } catch (error) {
       console.error("Error submitting project:", error);
       alert("Error submitting project. Please try again.");

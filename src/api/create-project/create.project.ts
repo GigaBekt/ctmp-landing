@@ -20,6 +20,12 @@ export const updateProject = async (
   return response.data;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const confirmProject = async (id: string): Promise<any> => {
+  const response = await api.post(`/projects/${id}/confirm`);
+  return response.data;
+};
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 //! need to change the return type to the correct type after the api is updated
 export const getEstimate = async (id: string): Promise<any> => {

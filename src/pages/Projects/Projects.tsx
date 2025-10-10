@@ -26,7 +26,7 @@ import { useAuthStore } from "@/stores/auth";
 const STATUS_OPTIONS: StatusOption[] = [
   { value: "all", label: "All Projects" },
   { value: "draft", label: "Draft" },
-  { value: "pending_review", label: "Pending Review" },
+  { value: "in_review", label: "In Review" },
   { value: "active", label: "Active & Bidding" },
   { value: "in_progress", label: "In Progress" },
   { value: "completed", label: "Completed" },
@@ -48,11 +48,11 @@ const SERVICE_ICONS = {
 const StatusBadge = ({ status }: { status: string }) => {
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case "pending_review":
+      case "in_review":
         return {
           bg: "bg-amber-100",
           text: "text-amber-800",
-          label: "Pending Review",
+          label: "In Review",
         };
       case "draft":
         return {
