@@ -27,7 +27,7 @@ const STATUS_OPTIONS: StatusOption[] = [
   { value: "all", label: "All Projects" },
   { value: "draft", label: "Draft" },
   { value: "pending_review", label: "Pending Review" },
-  { value: "active_bidding", label: "Active & Bidding" },
+  { value: "active", label: "Active & Bidding" },
   { value: "in_progress", label: "In Progress" },
   { value: "completed", label: "Completed" },
   { value: "canceled", label: "Canceled" },

@@ -60,7 +60,7 @@ export const mockProject: Project = {
   schedule_pref: "Next 2 weeks",
   notes:
     "Need complete HVAC system installation for 3-bedroom home. Existing system is 15 years old and needs replacement.",
-  status: "active_bidding",
+  status: "active",
   account: {
     id: "acc-001",
     type: "customer",

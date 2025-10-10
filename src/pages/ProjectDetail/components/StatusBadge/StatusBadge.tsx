@@ -18,7 +18,7 @@ const StatusBadge = ({ status, size = "md" }: StatusBadgeProps) => {
           text: "text-gray-800",
           label: "Draft",
         };
-      case "active_bidding":
+      case "active":
         return {
           bg: "bg-blue-100",
           text: "text-blue-800",
@@ -75,7 +75,7 @@ export const getStatusDescription = (status: string): string => {
       return "Project is awaiting review and approval";
     case "draft":
       return "Project is in draft stage and being prepared";
-    case "active_bidding":
+    case "active":
       return "Project is active and receiving vendor bids";
     case "in_progress":
       return "Project is currently being worked on";
