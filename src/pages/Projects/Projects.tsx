@@ -60,7 +60,7 @@ const StatusBadge = ({ status }: { status: string }) => {
           text: "text-gray-800",
           label: "Draft",
         };
-      case "active_bidding":
+      case "active":
         return {
           bg: "bg-blue-100",
           text: "text-blue-800",
