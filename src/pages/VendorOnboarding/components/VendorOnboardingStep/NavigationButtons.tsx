@@ -1,7 +1,7 @@
-import { MapPin, CheckCircle, CreditCard } from "phosphor-react";
+import { MapPin, CheckCircle, CreditCard, Spinner } from "phosphor-react";
 import { Button } from "@/components";
 
-interface NavigationButtonsProps {
+export interface NavigationButtonsProps {
   currentStep: "documents" | "locations" | "payment";
   isDocumentsStepComplete: boolean;
   isLocationsStepComplete: boolean;
@@ -9,6 +9,7 @@ interface NavigationButtonsProps {
   onPreviousStep: () => void;
   onNextStep: () => void;
   onSkip?: () => void;
+  isSubmitting?: boolean;
 }
 
 const NavigationButtons = ({
@@ -19,6 +20,7 @@ const NavigationButtons = ({
   onPreviousStep,
   onNextStep,
   onSkip,
+  isSubmitting = false,
 }: NavigationButtonsProps) => {
   const getBackButtonText = () => {
     if (currentStep === "locations") return "← Back to Documents";
@@ -68,15 +70,22 @@ const NavigationButtons = ({
         <Button
           onClick={onNextStep}
           disabled={
+            isSubmitting ||
             (currentStep === "documents" && !isDocumentsStepComplete) ||
             (currentStep === "locations" && !isLocationsStepComplete) ||
             (currentStep === "payment" && !isPaymentStepComplete)
           }
           size="lg"
           className="px-8 py-3 text-lg font-semibold"
-          leftIcon={getNextButtonIcon()}
+          leftIcon={
+            isSubmitting ? (
+              <Spinner className="animate-spin" size={20} />
+            ) : (
+              getNextButtonIcon()
+            )
+          }
         >
-          {getNextButtonText()}
+          {isSubmitting ? "Saving..." : getNextButtonText()}
         </Button>
       </div>
     </div>

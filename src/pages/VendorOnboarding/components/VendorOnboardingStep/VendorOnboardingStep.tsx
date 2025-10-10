@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { WarningCircle, Spinner } from "phosphor-react";
 import {
   uploadVendorDocument,
-  deleteVendorDocument,
   getDocumentTypes,
 } from "@/api/vendor/vendor-documents";
 import {
@@ -75,7 +74,6 @@ const VendorOnboardingStep = ({
       setIsLoading(false);
     }
   };
-
   const handleFileUpload = async (file: File, documentTypeId: string) => {
     const validation = validateFileForUpload(file);
     if (!validation.isValid) {
@@ -99,10 +97,7 @@ const VendorOnboardingStep = ({
 
   const handleDeleteDocument = async (documentId: string) => {
     try {
-      await deleteVendorDocument(vendorOrganizationId, documentId);
-      setUploadedDocuments((prev) =>
-        prev.filter((doc) => doc.id !== documentId)
-      );
+      console.log(documentId, "documentId");
     } catch {
       setError("Failed to delete document. Please try again.");
     }
@@ -125,17 +120,27 @@ const VendorOnboardingStep = ({
   };
 
   const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNextStep = async () => {
     if (currentStep === "documents") {
       setCurrentStep("locations");
     } else if (currentStep === "locations") {
-      const response = await createVendorLocation(vendorOrganizationId, {
-        location_ids: Array.from(selectedCities),
-      });
-      console.log(response, "response");
-      if (response) {
-        setCurrentStep("payment");
+      setIsSubmitting(true);
+      setError(null);
+      try {
+        const response = await createVendorLocation(vendorOrganizationId, {
+          location_ids: Array.from(selectedCities),
+        });
+        console.log(response, "response");
+        if (response) {
+          setCurrentStep("payment");
+        }
+      } catch (err) {
+        setError("Failed to save service areas. Please try again.");
+        console.error("Error creating vendor location:", err);
+      } finally {
+        setIsSubmitting(false);
       }
     } else {
       onComplete();
@@ -150,11 +155,8 @@ const VendorOnboardingStep = ({
     }
   };
 
-  const isDocumentsStepComplete = documentTypes
-    .filter((type) => type.is_required)
-    .every((requiredType) =>
-      uploadedDocuments.some((doc) => doc.document_type.id === requiredType.id)
-    );
+  const isDocumentsStepComplete = uploadedDocuments.length;
+
   const isLocationsStepComplete = selectedCities.size > 0;
   const isPaymentStepComplete = paymentMethodId !== null;
 
@@ -173,7 +175,7 @@ const VendorOnboardingStep = ({
     <div className="max-w-3xl mx-auto p-6 min-h-lvh">
       <ProgressIndicator
         currentStep={currentStep}
-        isDocumentsStepComplete={isDocumentsStepComplete}
+        isDocumentsStepComplete={isDocumentsStepComplete > 0}
         isLocationsStepComplete={isLocationsStepComplete}
         isPaymentStepComplete={isPaymentStepComplete}
       />
@@ -218,12 +220,13 @@ const VendorOnboardingStep = ({
 
       <NavigationButtons
         currentStep={currentStep}
-        isDocumentsStepComplete={isDocumentsStepComplete}
+        isDocumentsStepComplete={isDocumentsStepComplete > 0}
         isLocationsStepComplete={isLocationsStepComplete}
         isPaymentStepComplete={isPaymentStepComplete}
         onPreviousStep={handlePreviousStep}
         onNextStep={handleNextStep}
         onSkip={onSkip}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

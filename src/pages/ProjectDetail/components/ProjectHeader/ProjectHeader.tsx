@@ -1,17 +1,21 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowLeft, Share, Trash } from "phosphor-react";
 
 interface ProjectHeaderProps {
   onShare: () => void;
-  onDelete: () => void;
+  onDelete?: () => void;
 }
 
 export function ProjectHeader({ onShare, onDelete }: ProjectHeaderProps) {
+  const location = useLocation();
+  const isVendorRoute = location.pathname.startsWith("/vendor");
+  const backUrl = isVendorRoute ? "/vendor/projects" : "/dashboard/projects";
+
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
       <div className="space-y-1">
         <Link
-          to="/dashboard/projects"
+          to={backUrl}
           className="inline-flex items-center text-sm text-gray-600 hover:text-[#2c74b3] transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-1" />
@@ -28,13 +32,15 @@ export function ProjectHeader({ onShare, onDelete }: ProjectHeaderProps) {
           <Share className="w-4 h-4 mr-2" />
           Share
         </button>
-        <button
-          onClick={onDelete}
-          className="inline-flex items-center px-4 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-700 hover:bg-red-100 hover:border-red-300 transition-all font-medium shadow-sm"
-        >
-          <Trash className="w-4 h-4 mr-2" />
-          Delete Project
-        </button>
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="inline-flex items-center px-4 py-2.5 bg-red-50 border border-red-200 rounded-lg text-red-700 hover:bg-red-100 hover:border-red-300 transition-all font-medium shadow-sm"
+          >
+            <Trash className="w-4 h-4 mr-2" />
+            Delete Project
+          </button>
+        )}
       </div>
     </div>
   );

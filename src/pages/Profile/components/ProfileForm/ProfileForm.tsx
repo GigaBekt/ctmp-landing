@@ -5,7 +5,6 @@ import {
   EnvelopeSimple as Mail,
   Phone,
   Buildings as Building,
-  Globe,
   WarningCircle as AlertCircle,
   FloppyDisk as Save,
   X,
@@ -47,7 +46,7 @@ const InfoItem = ({
   label: string;
   value: string;
 }) => (
-  <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-100">
+  <div className="flex items-start gap-4 p-4  bg-gray-50 rounded-xl border border-gray-100">
     <div className="p-3 bg-white rounded-xl shadow-sm border border-gray-100">
       {icon}
     </div>
@@ -221,86 +220,6 @@ const ProfileForm = ({
                   {errors.phone.message}
                 </p>
               )}
-            </div>
-          </div>
-
-          {/* Additional Information */}
-          <div className="space-y-6">
-            <h4 className="text-md font-semibold text-gray-900">
-              Additional Information
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  {...register("address")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[#2c74b3] focus:ring-2 focus:ring-blue-100 transition-colors"
-                  placeholder="Street address"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City
-                </label>
-                <input
-                  type="text"
-                  {...register("city")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[#2c74b3] focus:ring-2 focus:ring-blue-100 transition-colors"
-                  placeholder="City"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  State
-                </label>
-                <input
-                  type="text"
-                  {...register("state")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[#2c74b3] focus:ring-2 focus:ring-blue-100 transition-colors"
-                  placeholder="State"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  ZIP Code
-                </label>
-                <input
-                  type="text"
-                  {...register("zipCode")}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[#2c74b3] focus:ring-2 focus:ring-blue-100 transition-colors"
-                  placeholder="ZIP Code"
-                />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Website
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Globe className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    type="url"
-                    {...register("website")}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:border-[#2c74b3] focus:ring-2 focus:ring-blue-100 transition-colors"
-                    placeholder="https://your-website.com"
-                  />
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Bio
-                </label>
-                <textarea
-                  {...register("bio")}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-[#2c74b3] focus:ring-2 focus:ring-blue-100 transition-colors"
-                  placeholder="Tell us about yourself..."
-                />
-              </div>
             </div>
           </div>
 

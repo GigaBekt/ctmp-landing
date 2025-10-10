@@ -293,4 +293,6 @@ fileName.tsx
 interface/index.ts
 index.ts - for import componenet
 
+alwats use bg-primary-500
+
 always use react phosphor icons for documentation https://phosphoricons.com/

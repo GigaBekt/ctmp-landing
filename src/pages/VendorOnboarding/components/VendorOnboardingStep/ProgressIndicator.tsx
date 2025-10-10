@@ -23,7 +23,7 @@ const ProgressIndicator = ({
               currentStep === "documents"
                 ? "bg-primary-600 text-white"
                 : isDocumentsStepComplete
-                ? "bg-green-600 text-white"
+                ? "bg-primary-600 text-white"
                 : "bg-gray-100 text-gray-400"
             }`}
           >
@@ -34,7 +34,7 @@ const ProgressIndicator = ({
               currentStep === "documents"
                 ? "text-primary-600"
                 : isDocumentsStepComplete
-                ? "text-green-600"
+                ? "text-primary-600"
                 : "text-gray-400"
             }`}
           >
@@ -45,7 +45,7 @@ const ProgressIndicator = ({
         {/* Connector 1 */}
         <div
           className={`w-16 h-1 rounded-full transition-all duration-300 ${
-            isDocumentsStepComplete ? "bg-green-600" : "bg-gray-200"
+            isDocumentsStepComplete ? "bg-primary-600" : "bg-gray-200"
           }`}
         ></div>
 
@@ -56,7 +56,7 @@ const ProgressIndicator = ({
               currentStep === "locations"
                 ? "bg-primary-600 text-white"
                 : isLocationsStepComplete
-                ? "bg-green-600 text-white"
+                ? "bg-primary-600 text-white"
                 : "bg-gray-100 text-gray-400"
             }`}
           >
@@ -67,7 +67,7 @@ const ProgressIndicator = ({
               currentStep === "locations"
                 ? "text-primary-600"
                 : isLocationsStepComplete
-                ? "text-green-600"
+                ? "text-primary-600"
                 : "text-gray-400"
             }`}
           >
@@ -78,7 +78,7 @@ const ProgressIndicator = ({
         {/* Connector 2 */}
         <div
           className={`w-16 h-1 rounded-full transition-all duration-300 ${
-            isLocationsStepComplete ? "bg-green-600" : "bg-gray-200"
+            isLocationsStepComplete ? "bg-primary-600" : "bg-gray-200"
           }`}
         ></div>
 
@@ -89,7 +89,7 @@ const ProgressIndicator = ({
               currentStep === "payment"
                 ? "bg-primary-600 text-white"
                 : isPaymentStepComplete
-                ? "bg-green-600 text-white"
+                ? "bg-primary-600 text-white"
                 : "bg-gray-100 text-gray-400"
             }`}
           >
@@ -100,7 +100,7 @@ const ProgressIndicator = ({
               currentStep === "payment"
                 ? "text-primary-600"
                 : isPaymentStepComplete
-                ? "text-green-600"
+                ? "text-primary-600"
                 : "text-gray-400"
             }`}
           >

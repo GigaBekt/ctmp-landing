@@ -16,6 +16,7 @@ import { type User as IUser } from "@/api/auth/interface";
 const VendorSidebar = () => {
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
+  console.log(user, "this is user");
   // Mock unread notifications count
   const unreadCount = 3;
 

@@ -16,6 +16,7 @@ import {
   CreateProject,
   Projects,
   ProjectDetail,
+  VendorProjectDetail,
   VendorOnboarding,
   Profile,
   Notifications,
@@ -141,7 +142,7 @@ const router = createBrowserRouter([
       },
       {
         path: "projects/:id",
-        element: <ProjectDetail />,
+        element: <VendorProjectDetail />,
       },
       {
         path: "profile",

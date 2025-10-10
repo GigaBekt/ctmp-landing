@@ -14,6 +14,7 @@ import {
   Eye,
 } from "phosphor-react";
 import { useAuthStore } from "@/stores/auth";
+import { authApi } from "@/api/auth/auth.api";
 
 // Mock data interfaces
 interface VendorStats {
@@ -59,7 +60,7 @@ const VendorDashboard = () => {
   const [availableProjects, setAvailableProjects] = useState<BidProject[]>([]);
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { user } = useAuthStore();
+  const { user, updateUser } = useAuthStore();
 
   // Mock data loading
   useEffect(() => {
@@ -199,6 +200,16 @@ const VendorDashboard = () => {
         return "text-blue-600 bg-blue-50";
     }
   };
+
+  const getUserInfo = async () => {
+    const response = await authApi.getCurrentUser();
+    if (response) {
+      updateUser(response.data);
+    }
+  };
+  useEffect(() => {
+    getUserInfo();
+  }, []);
 
   if (isLoading) {
     return (
