@@ -96,6 +96,11 @@ const AddressMapInput = ({
     lat: number;
     lng: number;
   } | null>(null);
+  const [mapCenter, setMapCenter] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [mapZoom, setMapZoom] = useState(15);
   const [showMap, setShowMap] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [isApiReady, setIsApiReady] = useState(false);
@@ -141,9 +146,12 @@ const AddressMapInput = ({
       const results = await getGeocode({ address: selectedAddress });
       const geocodeResult = results[0];
 
-      // Find city component
+      // Find city and state components
       const cityComponent = geocodeResult.address_components.find((component) =>
         component.types.includes("locality")
+      );
+      const stateComponent = geocodeResult.address_components.find(
+        (component) => component.types.includes("administrative_area_level_1")
       );
 
       // Verify the address is in allowed states
@@ -175,7 +183,12 @@ const AddressMapInput = ({
 
       const newCoordinates = { lat, lng };
       setCoordinates(newCoordinates);
+      setMapCenter(newCoordinates); // Set initial map center
       setShowMap(true);
+
+      // Extract city and state names
+      const city = cityComponent ? cityComponent.long_name : "";
+      const state = stateComponent ? stateComponent.long_name : "";
 
       // Pass complete location data
       const locationData: LocationData = {
@@ -184,6 +197,8 @@ const AddressMapInput = ({
         placeId,
         stateId,
         countyId,
+        city,
+        state,
       };
 
       onChange(selectedAddress, newCoordinates, locationData);
@@ -208,9 +223,13 @@ const AddressMapInput = ({
           if (results[0]) {
             const geocodeResult = results[0];
 
-            // Find city component
+            // Find city and state components
             const cityComponent = geocodeResult.address_components.find(
               (component) => component.types.includes("locality")
+            );
+            const stateComponent = geocodeResult.address_components.find(
+              (component) =>
+                component.types.includes("administrative_area_level_1")
             );
 
             // Verify the location is in allowed states
@@ -246,7 +265,12 @@ const AddressMapInput = ({
               extractLocationIds(geocodeResult);
 
             setCoordinates(newCoordinates);
+            setMapCenter(newCoordinates); // Update map center on click
             setSearchValue(newAddress, false);
+
+            // Extract city and state names
+            const city = cityComponent ? cityComponent.long_name : "";
+            const state = stateComponent ? stateComponent.long_name : "";
 
             // Pass complete location data
             const locationData: LocationData = {
@@ -255,6 +279,8 @@ const AddressMapInput = ({
               placeId,
               stateId,
               countyId,
+              city,
+              state,
             };
 
             onChange(newAddress, newCoordinates, locationData);
@@ -282,6 +308,7 @@ const AddressMapInput = ({
       // Show map for manual address entry (fallback)
       setShowMap(true);
       setCoordinates(defaultCenter); // Use default center for manual entry
+      setMapCenter(defaultCenter); // Set map center for manual entry
     }
   };
 
@@ -418,9 +445,19 @@ const AddressMapInput = ({
 
             <div className="h-64 sm:h-80">
               <Map
-                defaultCenter={coordinates}
-                defaultZoom={15}
+                center={mapCenter || coordinates}
+                zoom={mapZoom}
                 onClick={handleMapClick}
+                onZoomChanged={(event) => {
+                  if (event.detail?.zoom !== undefined) {
+                    setMapZoom(event.detail.zoom);
+                  }
+                }}
+                onCenterChanged={(event) => {
+                  if (event.detail?.center) {
+                    setMapCenter(event.detail.center);
+                  }
+                }}
                 style={{ width: "100%", height: "100%" }}
                 gestureHandling="greedy"
                 zoomControl={true}

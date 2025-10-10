@@ -9,6 +9,8 @@ export interface LocationData {
   placeId: string;
   stateId: string;
   countyId: string;
+  city: string;
+  state: string;
 }
 
 export interface AddressMapInputProps {
