@@ -15,7 +15,7 @@ import {
   OverviewTab,
   DocumentsTab,
 } from "./components";
-import type { Project } from "./types";
+import type { Project } from "@/pages/Projects/types";
 import { Tabs } from "@/components/ui";
 import { ConfirmationModal } from "@/components/shared/Modal";
 import { projectsApi } from "@/api/projects";
@@ -40,6 +40,7 @@ const ProjectDetail = () => {
         }
 
         const response = await projectsApi.getProjectById(id);
+        console.log({ response });
         setProject(response);
       } catch (err) {
         console.error("Error loading project:", err);
@@ -51,7 +52,7 @@ const ProjectDetail = () => {
 
     loadProject();
   }, [id]);
-
+  console.log({ project, error });
   const handleDelete = async () => {
     if (!project) return;
 
@@ -100,7 +101,7 @@ const ProjectDetail = () => {
         id: "documents",
         label: "Documents",
         icon: <FileText className="w-4 h-4" />,
-        content: <DocumentsTab />,
+        content: <DocumentsTab project={project} />,
       },
     ];
   };
@@ -156,7 +157,7 @@ const ProjectDetail = () => {
           onDelete={() => setIsDeleteModalOpen(true)}
         />
 
-        <ProjectIdDisplay projectId={project.id} />
+        <ProjectIdDisplay projectId={id as string} />
 
         <Tabs tabs={getProjectTabs()} className="mb-6" />
 

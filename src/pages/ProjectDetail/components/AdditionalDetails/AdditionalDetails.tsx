@@ -16,7 +16,7 @@ interface AdditionalDetailsProps {
 }
 
 // Mock data for testing (remove when API is ready)
-const useMockData = true;
+const useMockData = false;
 const mockData = {
   manufacturer: "Carrier",
   serviceCategory: "Installation",
@@ -46,12 +46,8 @@ export function AdditionalDetails({ project }: AdditionalDetailsProps) {
     if (useMockData) return mockData.manufacturer;
     if (!hvac_project_details?.manufacturer) return null;
     const mfr = hvac_project_details.manufacturer;
-    // Check if it's a response object with data array
-    if ("data" in mfr && Array.isArray(mfr.data) && mfr.data.length > 0) {
-      return mfr.data[0].name;
-    }
-    // Otherwise treat as direct object
-    return null;
+    // Direct manufacturer object
+    return mfr.name;
   };
 
   // Section component for better organization
@@ -131,12 +127,6 @@ export function AdditionalDetails({ project }: AdditionalDetailsProps) {
                       ? mockData.seerOption
                       : hvac_project_details?.hvac_seer_option?.name}
                   </p>
-                  {!useMockData &&
-                    hvac_project_details?.hvac_seer_option?.description && (
-                      <p className="text-xs text-gray-600 mt-0.5">
-                        {hvac_project_details.hvac_seer_option.description}
-                      </p>
-                    )}
                 </div>
               </InfoItem>
             )}

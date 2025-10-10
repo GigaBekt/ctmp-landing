@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
-  ManufacturersResponse,
+  // ManufacturersResponse,
   ServiceCategory,
 } from "@/api/services/interface";
 
@@ -38,6 +39,8 @@ export interface Project {
     };
   } | null;
   address: string | null;
+  latitude: number | null;
+  longitude: number | null;
   home_type: {
     id: string;
     key: string;
@@ -90,7 +93,15 @@ export interface Project {
   } | null;
   hvac_project_details: {
     id: string;
-    manufacturer: ManufacturersResponse | null;
+    manufacturer: {
+      id: string;
+      name: string;
+      key: string;
+      logo_url: string | null;
+      website_url: string | null;
+      created_at: string;
+      updated_at: string;
+    } | null;
     custom_heat_source: string | null;
     heat_source: {
       id: string;

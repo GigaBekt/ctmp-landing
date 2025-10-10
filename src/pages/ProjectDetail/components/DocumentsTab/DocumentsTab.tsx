@@ -4,27 +4,16 @@ import {
   Upload,
   Warning,
   CheckCircle,
+  Image,
 } from "phosphor-react";
 import { Card } from "@/components/ui";
+import type { Project } from "../../types";
 
-const mockDocuments = [
-  {
-    id: 1,
-    name: "Project_Requirements.pdf",
-    date: "Nov 10, 2023",
-    type: "pdf",
-    colorClass: "bg-blue-100 text-blue-600",
-    isRequired: false,
-  },
-  {
-    id: 2,
-    name: "Site_Photos.zip",
-    date: "Nov 10, 2023",
-    type: "zip",
-    colorClass: "bg-green-100 text-green-600",
-    isRequired: false,
-  },
-];
+interface DocumentsTabProps {
+  project: Project;
+}
+
+// Mock documents removed - now using real project images
 
 const requiredDocuments = [
   {
@@ -48,10 +37,22 @@ const requiredDocuments = [
   },
 ];
 
-export function DocumentsTab() {
+export function DocumentsTab({ project }: DocumentsTabProps) {
   const pendingRequiredDocs = requiredDocuments.filter((doc) => !doc.uploaded);
 
-  // Combine all uploaded documents (mock + uploaded required docs)
+  // Convert project images to document format
+  const projectImages = project.images.map((image) => ({
+    id: image.id,
+    name: image.description || `Image_${image.id}.jpg`,
+    date: new Date().toLocaleDateString(), // You might want to get actual date from API
+    type: "image",
+    colorClass: "bg-purple-100 text-purple-600",
+    isRequired: false,
+    url: image.url,
+    thumb_url: image.thumb_url,
+  }));
+
+  // Combine all uploaded documents (project images + uploaded required docs)
   const uploadedRequiredDocs = requiredDocuments
     .filter((doc) => doc.uploaded)
     .map((doc) => ({
@@ -63,7 +64,7 @@ export function DocumentsTab() {
       isRequired: true,
     }));
 
-  const allDocuments = [...mockDocuments, ...uploadedRequiredDocs];
+  const allDocuments = [...projectImages, ...uploadedRequiredDocs];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -92,7 +93,11 @@ export function DocumentsTab() {
                     <div
                       className={`p-2.5 ${doc.colorClass} rounded-lg group-hover:scale-105 transition-transform`}
                     >
-                      <FileText className="w-5 h-5" weight="duotone" />
+                      {doc.type === "image" ? (
+                        <Image className="w-5 h-5" weight="duotone" />
+                      ) : (
+                        <FileText className="w-5 h-5" weight="duotone" />
+                      )}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
@@ -106,7 +111,9 @@ export function DocumentsTab() {
                         )}
                       </div>
                       <p className="text-xs text-gray-600 mt-0.5">
-                        {doc.isRequired
+                        {doc.type === "image"
+                          ? `Photo uploaded`
+                          : doc.isRequired
                           ? `Uploaded on ${doc.date}`
                           : `Added on ${doc.date}`}
                       </p>
@@ -115,6 +122,14 @@ export function DocumentsTab() {
                   <button
                     className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded-lg transition-all"
                     aria-label={`Download ${doc.name}`}
+                    onClick={() => {
+                      if (doc.type === "image" && "url" in doc) {
+                        window.open(doc.url, "_blank");
+                      } else {
+                        // Handle other file types download
+                        console.log("Download:", doc.name);
+                      }
+                    }}
                   >
                     <Download className="w-5 h-5" weight="bold" />
                   </button>

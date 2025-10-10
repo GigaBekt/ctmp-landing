@@ -1,11 +1,7 @@
 import { useState } from "react";
 import { Copy, Check } from "phosphor-react";
 
-interface ProjectIdDisplayProps {
-  projectId: string;
-}
-
-export function ProjectIdDisplay({ projectId }: ProjectIdDisplayProps) {
+export function ProjectIdDisplay({ projectId }: { projectId: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {

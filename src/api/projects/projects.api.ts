@@ -8,8 +8,9 @@ export const projectsApi = {
   },
 
   getProjectById: async (id: string): Promise<Project> => {
-    const response = await api.get<Project>(`/projects/${id}`);
-    return response.data;
+    const response = await api.get<{ data: Project }>(`/projects/${id}`);
+    console.log("Raw API Response:", response);
+    return response.data.data;
   },
 
   deleteProject: async (id: string): Promise<void> => {
